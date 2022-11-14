@@ -1,0 +1,13 @@
+{
+    "name": "com.veryevildemons.veryevilutilities",
+    "version": "0.1.0",
+    "displayName": "Very Evil Utilities",
+    "description": "A general game development utilities package built into the Unity game development engine",
+    "unity": "2021.3",
+    "author": 
+    {
+        "name": "Andrew Murdoch",
+        "email": "",
+        "url": ""
+    }
+}
