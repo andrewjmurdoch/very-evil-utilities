@@ -12,6 +12,13 @@ namespace VED.Utilities
         public TransitionMapper TransitionMapper => _transitionMapper;
         private TransitionMapper _transitionMapper = null;
 
+        public TransitionMapper CustomTransitionMapper
+        {
+            get => _customTransitionMapper;
+            set => _customTransitionMapper = value;
+        }
+        private TransitionMapper _customTransitionMapper = null;
+
         private const float DEFAULT_DURATION = 0.5f;
         private const float DEFAULT_TIMEOUT = 200f;
 
@@ -32,7 +39,10 @@ namespace VED.Utilities
 
             _timer = new Timer(DEFAULT_DURATION);
             _awaiter = new Awaiter(DEFAULT_TIMEOUT);
-            _canvas  = ViewManager.Instance.GetView<TransitionView>().Canvas;
+
+            TransitionView transitionView = ViewManager.Instance.GetView<TransitionView>();
+            transitionView.Show();
+            _canvas = transitionView.Canvas;
         }
 
         public void Stop()
@@ -150,6 +160,7 @@ namespace VED.Utilities
             Type type = typeof(T);
 
             Transition original = _transitionMapper[type];
+            original ??= _customTransitionMapper?[type];
             if (original == null)
             {
                 Debug.LogError("Transition of type " + type + " cannot be found in TransitionMapper");

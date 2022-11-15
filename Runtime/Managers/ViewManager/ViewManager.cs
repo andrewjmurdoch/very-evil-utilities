@@ -11,6 +11,13 @@ namespace VED.Utilities
         public ViewMapper ViewMapper => _viewMapper;
         private ViewMapper _viewMapper = null;
 
+        public ViewMapper CustomViewMapper
+        {
+            get => _customViewMapper;
+            set => _customViewMapper = value;
+        }
+        private ViewMapper _customViewMapper = null;
+
         private Dictionary<Type, View> _views = new Dictionary<Type, View>();
 
         public Dictionary<View.Layers, Transform> Layers => _layers;
@@ -58,6 +65,7 @@ namespace VED.Utilities
             Type type = typeof(T);
 
             View original = _viewMapper[type];
+            original ??= _customViewMapper?[type];
             if (original == null)
             {
                 Debug.LogError("View of type " + type + " cannot be found in ViewMapper");
@@ -66,8 +74,6 @@ namespace VED.Utilities
 
             T instance = Instantiate((T)original, _layers[original.Layer]);
             _views.Add(type, instance);
-
-            instance.Show();
 
             return instance;
         }
@@ -80,8 +86,7 @@ namespace VED.Utilities
 
             T instance = (T)_views[type];
             _views.Remove(type);
-
-            instance.Hide(() => Destroy(instance));
+            Destroy(instance);
         }
     }
 }
