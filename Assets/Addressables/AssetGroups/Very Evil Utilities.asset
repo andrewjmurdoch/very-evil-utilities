@@ -15,19 +15,19 @@ MonoBehaviour:
   m_GroupName: Very Evil Utilities
   m_Data:
     m_SerializedData: []
-  m_GUID: ce763d058f15c7546bfe1c79c5be9fd5
+  m_GUID: 23f0e87e798ef43498cb65764f38fdca
   m_SerializeEntries:
-  - m_GUID: 976277db81395d54d97a9e5bc51cfb1d
-    m_Address: Packages/com.veryevildemons.veryevilutilities/Assets/ViewMapper/ViewMapper.asset
+  - m_GUID: 6875cc78561d3b641a751886d3087179
+    m_Address: Packages/com.veryevildemons.veryevilutilities/Assets/TransitionManager/TransitionMapper.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 6875cc78561d3b641a751886d3087179
-    m_Address: Packages/com.veryevildemons.veryevilutilities/Assets/TransitionMapper/TransitionMapper.asset
+  - m_GUID: 976277db81395d54d97a9e5bc51cfb1d
+    m_Address: Packages/com.veryevildemons.veryevilutilities/Assets/ViewManager/ViewMapper.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 2cae3642a712aef4cbb7a0b0e6b11f4f, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: fa065582363ac6645a691fe90afadaa8, type: 2}
-    - {fileID: 11400000, guid: 5673e9027fd840848ab30ddc1ec42b45, type: 2}
+    - {fileID: 11400000, guid: f1fad58b0056d0a479a3fdbd7b47d1a8, type: 2}
+    - {fileID: 11400000, guid: 94c6804fa71bbde4c9fef93aa91a6b67, type: 2}
