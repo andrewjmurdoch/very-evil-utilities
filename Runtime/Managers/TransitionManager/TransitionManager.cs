@@ -9,7 +9,6 @@ namespace VED.Utilities
 {
     public class TransitionManager : SingletonMonoBehaviour<TransitionManager>
     {
-        private const string TRANSITION_MAPPER_PATH = "Assets/Very Evil Demons/_Data/Utilities/TransitionMapper/TransitionMapper.asset";
         public TransitionMapper TransitionMapper => _transitionMapper;
         private TransitionMapper _transitionMapper = null;
 
@@ -28,7 +27,7 @@ namespace VED.Utilities
             base.Awake();
 
             // load via addressables physics manager settings
-            AsyncOperationHandle<TransitionMapper> transitionMapperHandle = Addressables.LoadAssetAsync<TransitionMapper>(TRANSITION_MAPPER_PATH);
+            AsyncOperationHandle<TransitionMapper> transitionMapperHandle = Addressables.LoadAssetAsync<TransitionMapper>(TransitionMapper.PATH);
             _transitionMapper = transitionMapperHandle.WaitForCompletion();
 
             _timer = new Timer(DEFAULT_DURATION);
