@@ -8,12 +8,17 @@ namespace VED.Utilities
 
         public void Push(State state)
         {
+            state.Enter();
             _stateStack.Push(state);
         }
 
         public State Pop()
         {
-            if (_stateStack.TryPop(out State result)) return result;
+            if (_stateStack.TryPop(out State result))
+            {
+                result.Exit();
+                return result; 
+            }
             return null;
         }
 
