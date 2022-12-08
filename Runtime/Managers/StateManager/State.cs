@@ -1,10 +1,12 @@
+using System;
+
 namespace VED.Utilities
 {
     public abstract class State
     {
-        public abstract void Enter();
-        public abstract void Exit();
-        public abstract void Tick();
-        public abstract void FixedTick();
+        public virtual void Enter(Action callback) { callback?.Invoke(); }
+        public virtual void Exit(Action callback) { callback?.Invoke(); }
+        public virtual void Tick() { }
+        public virtual void FixedTick() { }
     }
 }

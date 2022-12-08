@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace VED.Utilities
@@ -6,20 +7,24 @@ namespace VED.Utilities
     {
         private Stack<State> _stateStack = new Stack<State>();
 
-        public void Push(State state)
+        public void Push(State state, Action callback = null)
         {
-            state.Enter();
-            _stateStack.Push(state);
+            state.Enter(() =>
+            {
+                _stateStack.Push(state);
+                callback?.Invoke();
+            });
         }
 
-        public State Pop()
+        public void Pop(Action<State> callback = null)
         {
             if (_stateStack.TryPop(out State result))
             {
-                result.Exit();
-                return result; 
+                result.Exit(() =>
+                {
+                    callback?.Invoke(result);
+                });
             }
-            return null;
         }
 
         public void Tick()
