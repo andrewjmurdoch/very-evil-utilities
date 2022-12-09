@@ -1,110 +1,161 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace VED.Utilities
 {
     public class TimeManager : Singleton<TimeManager>
     {
-        public static float TimeScale 
+        public TimeManager() : base()
         {
-            get { return Instance._timeScale; } 
-            set { Instance.SetTimeScale(value); }
+            GameManager.Instance.StateManager.OnPop += OnPop;
         }
-        [SerializeField] private float _timeScale = 1f;
 
-        public static Action<float> OnTimeScaleChange;
+        private Dictionary<State, TimeState> _timeStates = new Dictionary<State, TimeState>();
+        private TimeState _defaultTimeState = new TimeState();
+        private TimeState _realTimeState = new TimeState();
 
-        public static float DeltaTime => UnityEngine.Time.deltaTime * TimeScale;
-
-        public static float FixedDeltaTime => UnityEngine.Time.fixedDeltaTime * TimeScale;
-
-        public static float RealTime => UnityEngine.Time.unscaledTime;
-
-        public static float Time => Instance._time;
-        private float _time = 0f;
-
-        private List<Timer> _timers = new List<Timer>();
-        private List<Timer> _timersAdded = new List<Timer>();
-        private List<Timer> _timersRemoved = new List<Timer>();
-
-        private List<Awaiter> _awaiters = new List<Awaiter>();
-        private List<Awaiter> _awaitersAdded = new List<Awaiter>();
-        private List<Awaiter> _awaitersRemoved = new List<Awaiter>();
-
-        private List<Stopwatch> _stopwatches = new List<Stopwatch>();
-        private List<Stopwatch> _stopwatchesAdded = new List<Stopwatch>();
-        private List<Stopwatch> _stopwatchesRemoved = new List<Stopwatch>();
-
-        private void SetTimeScale(float value)
+        public class TimeState
         {
-            _timeScale = Mathf.Max(0f, value);
-            OnTimeScaleChange?.Invoke(_timeScale);
+            public List<Timer> Timers = new List<Timer>();
+            public List<Timer> TimersAdded = new List<Timer>();
+            public List<Timer> TimersRemoved = new List<Timer>();
+
+            public List<Awaiter> Awaiters = new List<Awaiter>();
+            public List<Awaiter> AwaitersAdded = new List<Awaiter>();
+            public List<Awaiter> AwaitersRemoved = new List<Awaiter>();
+
+            public List<Stopwatch> Stopwatches = new List<Stopwatch>();
+            public List<Stopwatch> StopwatchesAdded = new List<Stopwatch>();
+            public List<Stopwatch> StopwatchesRemoved = new List<Stopwatch>();
+        }
+
+        public void OnPop(State state)
+        {
+            if (_timeStates.ContainsKey(state))
+            {
+                _timeStates.Remove(state);
+            }
         }
 
         public void Tick()
         {
-            _time += UnityEngine.Time.deltaTime * _timeScale;
+            // update realtime 
+            TickTimers(_realTimeState);
+            TickAwaiters(_realTimeState);
+            TickStopwatches(_realTimeState);
 
-            TickTimers();
-            TickAwaiters();
-            TickStopwatches();
+            // update scaled time
+            TimeState timeState = GetTimeState();
+            TickTimers(timeState);
+            TickAwaiters(timeState);
+            TickStopwatches(timeState);
         }
 
-        private void TickTimers()
+        public TimeState GetTimeState()
         {
-            _timersRemoved.ForEach(t => _timers.Remove(t));
-            _timersRemoved.Clear();
-            _timersAdded.ForEach(t => _timers.Add(t));
-            _timersAdded.Clear();
-            _timers.ForEach(t => t.Tick());
+            if (GameManager.Instance.StateManager.TryPeek(out State result))
+            {
+                if (_timeStates.ContainsKey(result))
+                {
+                    return _timeStates[result];
+                }
+                _timeStates.Add(result, new TimeState());
+            };
+            return _defaultTimeState;
         }
 
-        private void TickAwaiters()
+        private void TickTimers(TimeState timeState)
         {
-            _awaitersRemoved.ForEach(a => _awaiters.Remove(a));
-            _awaitersRemoved.Clear();
-            _awaitersAdded.ForEach(a => _awaiters.Add(a));
-            _awaitersAdded.Clear();
-            _awaiters.ForEach(a => a.Tick());
+            timeState.TimersRemoved.ForEach(t => timeState.Timers.Remove(t));
+            timeState.TimersRemoved.Clear();
+            timeState.TimersAdded.ForEach(t => timeState.Timers.Add(t));
+            timeState.TimersAdded.Clear();
+            timeState.Timers.ForEach(t => t.Tick());
         }
 
-        private void TickStopwatches()
+        private void TickAwaiters(TimeState timeState)
         {
-            _stopwatchesRemoved.ForEach(s => _stopwatches.Remove(s));
-            _stopwatchesRemoved.Clear();
-            _stopwatchesAdded.ForEach(s => _stopwatches.Add(s));
-            _stopwatchesAdded.Clear();
-            _stopwatches.ForEach(s => s.Tick());
+            timeState.AwaitersRemoved.ForEach(a => timeState.Awaiters.Remove(a));
+            timeState.AwaitersRemoved.Clear();
+            timeState.AwaitersAdded.ForEach(a => timeState.Awaiters.Add(a));
+            timeState.AwaitersAdded.Clear();
+            timeState.Awaiters.ForEach(a => a.Tick());
         }
 
+        private void TickStopwatches(TimeState timeState)
+        {
+            timeState.StopwatchesRemoved.ForEach(s => timeState.Stopwatches.Remove(s));
+            timeState.StopwatchesRemoved.Clear();
+            timeState.StopwatchesAdded.ForEach(s => timeState.Stopwatches.Add(s));
+            timeState.StopwatchesAdded.Clear();
+            timeState.Stopwatches.ForEach(s => s.Tick());
+        }
+
+        #region Add/Remove
         public void AddTimer(Timer timer)
         {
-            _timersAdded.Add(timer);
+            TimeState timeState = GetTimeState();
+            timeState.TimersAdded.Add(timer);
         }
 
-        public void RemoveTimer(Timer timer)
+        public void AddTimer(TimerRealtime timer)
         {
-            _timersRemoved.Add(timer);
+            _realTimeState.TimersAdded.Add(timer);
+        }
+
+        public void RemoveTimer(Timer timer, TimeState timeState)
+        {
+            if (timeState == null) return;
+            timeState.TimersRemoved.Add(timer);
+        }
+
+        public void RemoveTimer(TimerRealtime timer)
+        {
+            _realTimeState.TimersRemoved.Add(timer);
         }
 
         public void AddAwaiter(Awaiter awaiter)
         {
-            _awaitersAdded.Add(awaiter);
+            TimeState timeState = GetTimeState();
+            timeState.AwaitersAdded.Add(awaiter);
         }
 
-        public void RemoveAwaiter(Awaiter awaiter)
+        public void AddAwaiter(AwaiterRealtime awaiter)
         {
-            _awaitersRemoved.Add(awaiter);
+            _realTimeState.AwaitersAdded.Add(awaiter);
         }
+
+        public void RemoveAwaiter(Awaiter awaiter, TimeState timeState)
+        {
+            if (timeState == null) return;
+            timeState.AwaitersRemoved.Add(awaiter);
+        }
+
+        public void RemoveAwaiter(AwaiterRealtime awaiter)
+        {
+            _realTimeState.AwaitersRemoved.Add(awaiter);
+        }
+
         public void AddStopwatch(Stopwatch stopwatch)
         {
-            _stopwatchesAdded.Add(stopwatch);
+            TimeState timeState = GetTimeState();
+            timeState.StopwatchesAdded.Add(stopwatch);
         }
 
-        public void RemoveStopwatch(Stopwatch stopwatch)
+        public void AddStopwatch(StopwatchRealtime stopwatch)
         {
-            _stopwatchesRemoved.Add(stopwatch);
+            _realTimeState.StopwatchesAdded.Add(stopwatch);
         }
+
+        public void RemoveStopwatch(Stopwatch stopwatch, TimeState timeState)
+        {
+            if (timeState == null) return;
+            timeState.StopwatchesRemoved.Add(stopwatch);
+        }
+
+        public void RemoveStopwatch(StopwatchRealtime stopwatch)
+        {
+            _realTimeState.StopwatchesRemoved.Add(stopwatch);
+        }
+        #endregion
     }
 }

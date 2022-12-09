@@ -6,77 +6,69 @@ namespace VED.Utilities
     [Serializable]
     public class Awaiter
     {
-        public float Timeout { get { return _currentTimeout; } set { _currentTimeout = value; _defaultTimeout = value; } }
-        [SerializeField] protected float _currentTimeout = 0;
+        public virtual float Time => _time;
+        [SerializeField, ReadOnly] protected float _time = 0f;
+
+        public float Timeout { get { return _timeout; } set { _timeout = value; _defaultTimeout = value; } }
+        [SerializeField, ReadOnly] protected float _timeout = 0;
         protected float _defaultTimeout = 0;
 
-        public bool Timely => Timeout <= 0 || Elapsed < Timeout;
-        [SerializeField] protected bool _debugTimely = false;
-
-        public float Epoch { get; protected set; } = 1f;
-        protected float _debugEpoch = 1f;
-
-        public virtual float Elapsed => Mathf.Max(TimeManager.Time - Epoch, 0);
-        [SerializeField] protected float _debugElapsed = 1f;
+        public bool Timely => _timeout <= 0 || _time < _timeout;
+        [SerializeField, ReadOnly] protected bool _timely = false;
 
         public bool Awaiting => _awaiting;
-        protected bool _awaiting = false;
+        [SerializeField, ReadOnly] protected bool _awaiting = false;
 
         protected Func<bool> _function = null;
         protected Action _callback = null;
+        protected bool _recursive = false;
+        protected TimeManager.TimeState _timeState = null;
 
         public Awaiter(float timeout = 0)
         {
-            _currentTimeout = timeout;
+            _timeout = timeout;
             _defaultTimeout = timeout;
         }
 
         public virtual void Reset()
         {
-            TimeManager.Instance.RemoveAwaiter(this);
+            TimeManager.Instance.RemoveAwaiter(this, _timeState);
 
             _function = null;
             _callback = null;
             _awaiting = false;
-
-            _currentTimeout = _defaultTimeout;
-            Epoch = 0;
-
-            UpdateDebug();
+            _timeout  = _defaultTimeout;
+            _timely   = Timely;
         }
 
         public virtual void Set(Func<bool> function, Action callback, float timeout = 0)
         {
             Reset();
 
-            _function = function;
-            _callback = callback;
-            _awaiting = true;
-
-            if (timeout != 0) _currentTimeout = timeout;
-            Epoch = TimeManager.Time;
+            _awaiting  = true;
+            _recursive = true;
+            _function  = function;
+            _callback  = callback;
+            _timeState = TimeManager.Instance.GetTimeState();
+            _timeout   = timeout == 0 ? _defaultTimeout : timeout;
 
             TimeManager.Instance.AddAwaiter(this);
         }
 
         public virtual void Tick()
         {
-            UpdateDebug();
+            _time += UnityEngine.Time.deltaTime;
+            _timely = Timely;
 
             if (!_function.Invoke() && Timely)
             {
                 return;
             }
 
+            _recursive = false;
             _callback?.Invoke();
-            Reset();
-        }
 
-        protected void UpdateDebug()
-        {
-            _debugEpoch    = Epoch;
-            _debugElapsed  = Elapsed;
-            _debugTimely   = Timely;
+            if (!_recursive) Reset();
         }
     }
 }

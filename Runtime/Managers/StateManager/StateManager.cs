@@ -7,12 +7,16 @@ namespace VED.Utilities
     {
         private Stack<State> _stateStack = new Stack<State>();
 
+        public Action OnPush = null;
+        public Action<State> OnPop  = null;
+
         public void Push(State state, Action callback = null)
         {
             state.Enter(() =>
             {
                 _stateStack.Push(state);
                 callback?.Invoke();
+                OnPush?.Invoke();
             });
         }
 
@@ -23,8 +27,19 @@ namespace VED.Utilities
                 result.Exit(() =>
                 {
                     callback?.Invoke(result);
+                    OnPop?.Invoke(result);
                 });
             }
+        }
+
+        public bool TryPeek(out State result)
+        {
+            result = null;
+            if (_stateStack.TryPeek(out result))
+            {
+                return true; 
+            }
+            return false;
         }
 
         public void Tick()

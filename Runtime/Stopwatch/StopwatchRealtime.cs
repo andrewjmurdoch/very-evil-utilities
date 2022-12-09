@@ -1,35 +1,25 @@
+using System;
+
 namespace VED.Utilities
 {
+    [Serializable]
     public class StopwatchRealtime : Stopwatch
     {
         public override void Start()
         {
-            Running = true;
-            Epoch = TimeManager.RealTime;
-            End = TimeManager.RealTime;
+            _running = true;
             TimeManager.Instance.AddStopwatch(this);
-            UpdateDebug();
         }
 
         public override void Stop()
         {
-            Running = false;
-            End = TimeManager.RealTime;
+            _running = false;
             TimeManager.Instance.RemoveStopwatch(this);
-            UpdateDebug();
-        }
-
-        public override void Restart()
-        {
-            Epoch = TimeManager.RealTime;
-            End = TimeManager.RealTime;
-            UpdateDebug();
         }
 
         public override void Tick()
         {
-            End = TimeManager.RealTime;
-            UpdateDebug();
+            _time += UnityEngine.Time.unscaledDeltaTime;
         }
     }
 }

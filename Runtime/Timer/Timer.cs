@@ -6,70 +6,67 @@ namespace VED.Utilities
     [Serializable]
     public class Timer
     {
-        public float Duration { get { return _currentDuration; } set { _currentDuration = value; _defaultDuration = value; } }
-        [SerializeField, ReadOnly] protected float _currentDuration = 0;
+        public virtual float Time => _time;
+        [SerializeField, ReadOnly] protected float _time = 0f;
+
+        public float Duration { get { return _duration; } set { _duration = value; _defaultDuration = value; } }
+        [SerializeField, ReadOnly] protected float _duration = 0;
         protected float _defaultDuration = 0;
 
-        public float Epoch { get; protected set; } = 1f;
-        protected float _debugEpoch = 1f;
-
-        public virtual float Elapsed => Duration > 0f ? Mathf.Clamp01((TimeManager.Time - Epoch) / Duration) : 1f;
-        [SerializeField, ReadOnly] protected float _debugElapsed = 1f;
-
-        public virtual float InverseElapsed => 1f - Elapsed;
-        protected float _debugInverseElapsed = 1f;
+        public virtual float Elapsed => Duration > 0f ? Mathf.Clamp01(Time / Duration) : 1f;
+        [SerializeField, ReadOnly] protected float _elapsed = 1f;
 
         public bool Complete => Elapsed >= 1f;
-        protected bool _debugComplete = true;
+        [SerializeField, ReadOnly] protected bool _complete = true;
 
-        public float Time => Elapsed * Duration;
-        [SerializeField, ReadOnly] protected float _debugTime = 1f;
+        public virtual float InverseElapsed => 1f - Elapsed;
 
         public float InverseTime => InverseElapsed * Duration;
-        protected float _debugInverseTime = 0f;
 
         protected Action _tick = null;
         protected Action _callback = null;
 
-        private bool _recursive = false;
+        protected bool _recursive = false;
+        protected TimeManager.TimeState _timeState = null;
 
         public Timer(float duration = 0)
         {
-            _currentDuration = duration;
+            _time = duration;
+            _duration = duration;
             _defaultDuration = duration;
-            Epoch = TimeManager.Time - (Duration * 2f);
         }
 
         public virtual void Reset()
         {
-            TimeManager.Instance.RemoveTimer(this);
+            TimeManager.Instance.RemoveTimer(this, _timeState);
 
+            _time = _defaultDuration;
             _tick = null;
             _callback = null;
-
-            _currentDuration = _defaultDuration;
-            Epoch = TimeManager.Time - (Duration * 2f);
-
-            UpdateDebug();
+            _duration = _defaultDuration;
+            _elapsed = Elapsed;
+            _complete = Complete;
         }
 
-        public virtual void Set(Action update = null, Action callback = null, float duration = 0)
+        public virtual void Set(Action tick = null, Action callback = null, float duration = 0)
         {
             Reset();
 
+            _time = 0f;
             _recursive = true;
-
-            _tick = update;
+            _timeState = TimeManager.Instance.GetTimeState();
+            _tick = tick;
             _callback = callback;
-            _currentDuration = (duration != 0) ? duration : _defaultDuration;
-            Epoch = TimeManager.Time;
+            _duration = (duration != 0) ? duration : _defaultDuration;
 
             TimeManager.Instance.AddTimer(this);
         }
 
-        public void Tick()
+        public virtual void Tick()
         {
-            UpdateDebug();
+            _time += UnityEngine.Time.deltaTime;
+            _elapsed = Elapsed;
+            _complete = Complete;
 
             if (!Complete)
             {
@@ -78,21 +75,11 @@ namespace VED.Utilities
             }
 
             _recursive = false;
-
             _tick?.Invoke();
             _callback?.Invoke();
 
+            // if timer has set itself within tick or callback invocations, it is recursive and shouldn't reset here
             if (!_recursive) Reset();
-        }
-
-        protected void UpdateDebug()
-        {
-            _debugEpoch          = Epoch;
-            _debugElapsed        = Elapsed;
-            _debugInverseElapsed = InverseElapsed;
-            _debugComplete       = Complete;
-            _debugTime           = Time;
-            _debugInverseTime    = InverseTime;
         }
     }
 }
