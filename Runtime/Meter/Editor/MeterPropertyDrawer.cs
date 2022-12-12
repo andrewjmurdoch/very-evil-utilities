@@ -7,22 +7,25 @@ namespace VED.Utilities
     [CustomPropertyDrawer(typeof(Meter))]
     public class MeterPropertyDrawer : PropertyDrawer
     {
-        private const int RATIO = 5;
+        private const int RATIO = 3;
         private const float ARRAY_ICON_HEIGHT = 35f;
         private const float ARRAY_ELEMENT_HEIGHT = 20f;
+        private const float SPACER = 2f;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            float height = EditorGUIUtility.singleLineHeight * 3f;
+            // 3 due to having 3 lines (min/max/value, rules, events) by default
+            float height = (ARRAY_ELEMENT_HEIGHT * 3f) + (SPACER * 3f);
 
             SerializedProperty propRules = property.FindPropertyRelative("_rules");
             if (propRules.isExpanded)
             {
                 height += ARRAY_ICON_HEIGHT;
+                if (propRules.arraySize <= 0) height += ARRAY_ELEMENT_HEIGHT;
                 for (int i = 0; i < propRules.arraySize; i++)
                 {
-                    SerializedProperty element = propRules.GetArrayElementAtIndex(i);
-                    height += ARRAY_ELEMENT_HEIGHT * element.CountInProperty();
+                    height += ARRAY_ELEMENT_HEIGHT;
+                    if (propRules.GetArrayElementAtIndex(i).isExpanded) height += ARRAY_ELEMENT_HEIGHT;
                 }
             }
 
@@ -30,10 +33,11 @@ namespace VED.Utilities
             if (propEvents.isExpanded)
             {
                 height += ARRAY_ICON_HEIGHT;
+                if (propEvents.arraySize <= 0) height += ARRAY_ELEMENT_HEIGHT;
                 for (int i = 0; i < propEvents.arraySize; i++)
                 {
-                    SerializedProperty element = propEvents.GetArrayElementAtIndex(i);
-                    height += ARRAY_ELEMENT_HEIGHT * element.CountInProperty();
+                    height += ARRAY_ELEMENT_HEIGHT;
+                    if (propEvents.GetArrayElementAtIndex(i).isExpanded) height += ARRAY_ELEMENT_HEIGHT;
                 }
             }
 
@@ -75,32 +79,34 @@ namespace VED.Utilities
 
             // Meter Rules
             SerializedProperty propRules = property.FindPropertyRelative("_rules");
-            float propRulesHeight = EditorGUIUtility.singleLineHeight;
+            float propRulesHeight = ARRAY_ELEMENT_HEIGHT;
             if (propRules.isExpanded)
             {
                 propRulesHeight += ARRAY_ICON_HEIGHT;
+                if (propRules.arraySize <= 0)  propRulesHeight += ARRAY_ELEMENT_HEIGHT;
                 for (int i = 0; i < propRules.arraySize; i++)
                 {
-                    SerializedProperty element = propRules.GetArrayElementAtIndex(i);
-                    propRulesHeight += ARRAY_ELEMENT_HEIGHT * element.CountInProperty();
+                    propRulesHeight += ARRAY_ELEMENT_HEIGHT;
+                    if (propRules.GetArrayElementAtIndex(i).isExpanded) propRulesHeight += ARRAY_ELEMENT_HEIGHT;
                 }
             }
-            Rect rectRules = new Rect(position.min.x, position.min.y + rectMulti.height, position.width, propRulesHeight);
+            Rect rectRules = new Rect(position.min.x, position.min.y + rectMulti.height + SPACER, position.width, propRulesHeight);
             EditorGUI.PropertyField(rectRules, propRules, true);
             
             // Meter Events
             SerializedProperty propEvents = property.FindPropertyRelative("_events");
-            float propEventHeight = EditorGUIUtility.singleLineHeight;
+            float propEventHeight = ARRAY_ELEMENT_HEIGHT;
             if (propEvents.isExpanded)
             {
                 propEventHeight += ARRAY_ICON_HEIGHT;
+                if (propEvents.arraySize <= 0) propEventHeight += ARRAY_ELEMENT_HEIGHT;
                 for (int i = 0; i < propEvents.arraySize; i++)
                 {
-                    SerializedProperty element = propEvents.GetArrayElementAtIndex(i);
-                    propEventHeight += ARRAY_ELEMENT_HEIGHT * element.CountInProperty();
+                    propEventHeight += ARRAY_ELEMENT_HEIGHT;
+                    if (propEvents.GetArrayElementAtIndex(i).isExpanded) propEventHeight += ARRAY_ELEMENT_HEIGHT;
                 }
             }
-            Rect rectEvents = new Rect(position.min.x, position.min.y + rectMulti.height + rectRules.height, position.width, propEventHeight);
+            Rect rectEvents = new Rect(position.min.x, position.min.y + rectMulti.height + rectRules.height + SPACER, position.width, propEventHeight);
             EditorGUI.PropertyField(rectEvents, propEvents, true);
         }
     }

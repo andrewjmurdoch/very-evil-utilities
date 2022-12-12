@@ -7,7 +7,7 @@ namespace VED.Utilities
     [CustomPropertyDrawer(typeof(MeterSettings))]
     public class MeterSettingsPropertyDrawer : PropertyDrawer
     {
-        private const int RATIO = 5;
+        private const int RATIO = 3;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
