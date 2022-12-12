@@ -25,6 +25,7 @@ namespace VED.Utilities
 #if UNITY_EDITOR
         public void OnValidate()
         {
+            _viewDictionary.Clear();
             foreach (View view in _views)
             {
                 if (view == null) continue;
