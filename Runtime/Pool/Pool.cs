@@ -10,28 +10,31 @@ namespace VED.Utilities
         private Stack<T> _stack = new Stack<T>();
         private Transform _transform = null;
 
+        public List<T> Active => _active;
+        private List<T> _active = new List<T>();
+
         private Action<T> _onCreate = null;
         private Action<T> _onDestroy = null;
-        private Action<T> _onPool = null;
-        private Action<T> _onUnpool = null;
+        private Action<T> _onPush = null;
+        private Action<T> _onPop = null;
 
         private const int INITIAL_SIZE = 30;
 
-        public Pool(Transform parent, T original, int size = INITIAL_SIZE, Action<T> onCreate = null, Action<T> onDestroy = null, Action<T> onPool = null, Action<T> onUnpool = null)
+        public Pool(Transform parent, T original, int size = INITIAL_SIZE, Action<T> onCreate = null, Action<T> onDestroy = null, Action<T> onPush = null, Action<T> onPop = null)
         {
             _original = original;
-            
+
             // create transform to hold pooled objects
             _transform = new GameObject(typeof(T).ToString() + " Pool").transform;
             _transform.SetParent(parent);
             _transform.gameObject.SetActive(false);
 
-            _onCreate  = onCreate;
+            _onCreate = onCreate;
             _onDestroy = onDestroy;
-            _onPool    = onPool;
-            _onUnpool  = onUnpool;
+            _onPush = onPush;
+            _onPop = onPop;
 
-            Resize(size);
+            Extend(size);
         }
 
         public void Destroy()
@@ -49,10 +52,12 @@ namespace VED.Utilities
 
         public T Pop()
         {
-            Resize();
+            Extend();
+
             T instance = _stack.Pop();
             instance.transform.SetParent(null);
-            _onUnpool?.Invoke(instance);
+            _active.Add(instance);
+            _onPop?.Invoke(instance);
             return instance;
         }
 
@@ -60,14 +65,15 @@ namespace VED.Utilities
         {
             if (_stack.Contains(instance)) return;
 
-            _onPool?.Invoke(instance);
-            instance.transform.SetParent(_transform);
+            _active.Remove(instance);
             _stack.Push(instance);
+            instance.transform.SetParent(_transform);
+            _onPush?.Invoke(instance);
         }
 
-        public void Resize(int size = 1)
+        public void Extend(int size = 0)
         {
-            if (_stack.Count > 0) return;
+            if (size == 0 && _stack.Count > 0) return;
 
             size = Mathf.Max(1, size);
             for (int i = 0; i < size; i++)
