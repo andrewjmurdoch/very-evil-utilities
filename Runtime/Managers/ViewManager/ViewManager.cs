@@ -33,7 +33,7 @@ namespace VED.Utilities
             _viewMapper = viewMapperHandle.WaitForCompletion();
 
             _canvas = new GameObject("View Canvas").AddComponent<Canvas>();
-            _canvas.transform.parent = transform;
+            _canvas.transform.SetParent(transform);
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
             foreach (string name in Enum.GetNames(typeof(View.Layers)))
