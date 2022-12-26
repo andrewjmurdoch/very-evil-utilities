@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
@@ -35,6 +36,7 @@ namespace VED.Utilities
             _canvas = new GameObject("View Canvas").AddComponent<Canvas>();
             _canvas.transform.SetParent(transform);
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _canvas.gameObject.AddComponent<GraphicRaycaster>();
 
             foreach (string name in Enum.GetNames(typeof(View.Layers)))
             {
