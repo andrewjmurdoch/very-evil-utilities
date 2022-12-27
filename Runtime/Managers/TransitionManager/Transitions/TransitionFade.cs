@@ -7,7 +7,7 @@ namespace VED.Utilities
     public class TransitionFade : Transition
     {
         private Image _image = null;
-        private Timer _timer = null;
+        private TimerRealtime _timer = null;
 
         private const float ALPHA_MIN = 0f;
         private const float ALPHA_MAX = 1f;
@@ -15,7 +15,7 @@ namespace VED.Utilities
         protected void Awake()
         {
             _image = transform.Find("Image").GetComponent<Image>();
-            _timer = new Timer(DEFAULT_DURATION);
+            _timer = new TimerRealtime(DEFAULT_DURATION);
         }
 
         public override void Stop()
