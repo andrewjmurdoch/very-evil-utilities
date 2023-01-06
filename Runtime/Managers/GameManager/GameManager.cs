@@ -7,6 +7,7 @@ namespace VED.Utilities
 
         private void Update()
         {
+            TimeManager.Instance.Tick();
             _stateManager.Tick();
         }
 
