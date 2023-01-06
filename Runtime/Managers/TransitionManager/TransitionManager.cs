@@ -1,23 +1,25 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.SceneManagement;
 
 namespace VED.Utilities
 {
     public class TransitionManager : SingletonMonoBehaviour<TransitionManager>
     {
-        public TransitionMapper TransitionMapper => _transitionMapper;
-        private TransitionMapper _transitionMapper = null;
-
-        public TransitionMapper CustomTransitionMapper
+        public TransitionMapper TransitionMapper
         {
-            get => _customTransitionMapper;
-            set => _customTransitionMapper = value;
+            get
+            {
+                return _transitionMapper;
+            }
+            set
+            {
+                if (_transitionMapper != null) DeinitTransitionMapper();
+                _transitionMapper = value;
+            }
         }
-        private TransitionMapper _customTransitionMapper = null;
+        private TransitionMapper _transitionMapper = null;
 
         private const float DEFAULT_DURATION = 0.5f;
         private const float DEFAULT_TIMEOUT = 200f;
@@ -33,16 +35,21 @@ namespace VED.Utilities
         {
             base.Awake();
 
-            // load via addressables physics manager settings
-            AsyncOperationHandle<TransitionMapper> transitionMapperHandle = Addressables.LoadAssetAsync<TransitionMapper>(TransitionMapper.PATH);
-            _transitionMapper = transitionMapperHandle.WaitForCompletion();
-
             _timer = new Timer(DEFAULT_DURATION);
             _awaiter = new Awaiter(DEFAULT_TIMEOUT);
 
             TransitionView transitionView = ViewManager.Instance.GetView<TransitionView>();
             transitionView.Show();
             _canvas = transitionView.Canvas;
+        }
+
+        private void DeinitTransitionMapper()
+        {
+            // destroy all current transitions
+            for (int i = 0; i < _canvas.transform.childCount; i++)
+            {
+                Destroy(_canvas.transform.GetChild(0).gameObject);
+            }
         }
 
         public void Stop()
@@ -160,7 +167,6 @@ namespace VED.Utilities
             Type type = typeof(T);
 
             Transition original = _transitionMapper[type];
-            original ??= _customTransitionMapper?[type];
             if (original == null)
             {
                 Debug.LogError("Transition of type " + type + " cannot be found in TransitionMapper");
