@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Nova;
 
 namespace VED.Utilities
 {
@@ -23,19 +24,33 @@ namespace VED.Utilities
 
         private Dictionary<Type, View> _views = new Dictionary<Type, View>();
 
-        public Dictionary<string, Transform> ViewLayers => _viewLayers;
-        private Dictionary<string, Transform> _viewLayers = new Dictionary<string, Transform>();
+        public Dictionary<string, UIBlock2D> ViewLayers => _viewLayers;
+        private Dictionary<string, UIBlock2D> _viewLayers = new Dictionary<string, UIBlock2D>();
 
-        private Canvas _canvas = null;
+        private UIBlock2D _uiBlock2D = null;
+        private ScreenSpace _screenSpace = null;
+        private Camera _camera = null;
 
         protected override void Awake()
         {
             base.Awake();
 
-            _canvas = new GameObject("View Canvas").AddComponent<Canvas>();
-            _canvas.transform.SetParent(transform);
-            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            _canvas.gameObject.AddComponent<GraphicRaycaster>();
+            _camera = new GameObject("View Camera").AddComponent<Camera>();
+            _camera.transform.SetParent(transform);
+            _camera.transform.position = new Vector3(0f, 0f, -10f);
+            _camera.backgroundColor = Color.black;
+            _camera.orthographic = true;
+            _camera.cullingMask = 1 << LayerMask.NameToLayer("UI");
+            _camera.clearFlags = CameraClearFlags.Nothing;
+            _camera.depth = 100;
+
+            _uiBlock2D = new GameObject("View UIBlock2D").AddComponent<UIBlock2D>();
+            _uiBlock2D.transform.SetParent(transform);
+            _uiBlock2D.BodyEnabled = false;
+            _uiBlock2D.GameObjectLayer = LayerMask.NameToLayer("UI");
+
+            _screenSpace = _uiBlock2D.gameObject.AddComponent<ScreenSpace>();
+            _screenSpace.TargetCamera = _camera;
         }
 
         private void InitViewMapper(ViewMapper viewMapper)
@@ -44,25 +59,23 @@ namespace VED.Utilities
 
             foreach (ViewLayer viewLayer in _viewMapper.ViewLayers)
             {
-                RectTransform rectTransform = new GameObject(viewLayer.ID).AddComponent<RectTransform>();
-                rectTransform.SetParent(_canvas.transform);
-                rectTransform.SetAsLastSibling();
-                rectTransform.anchorMin = new Vector2(0.0f, 0.0f);
-                rectTransform.anchorMax = new Vector2(1.0f, 1.0f);
-                rectTransform.pivot     = new Vector2(0.5f, 0.5f);
-                rectTransform.offsetMin = new Vector2(0.0f, 0.0f);
-                rectTransform.offsetMax = new Vector2(0.0f, 0.0f);
+                UIBlock2D uiBlock2D = new GameObject(viewLayer.ID).AddComponent<UIBlock2D>();
+                uiBlock2D.transform.SetParent(_uiBlock2D.transform);
+                uiBlock2D.transform.SetAsLastSibling();
+                uiBlock2D.BodyEnabled = false;
+                uiBlock2D.Size.Percent = new Vector3(1f, 1f, 1f);
+                uiBlock2D.GameObjectLayer = LayerMask.NameToLayer("UI");
 
-                _viewLayers.Add(viewLayer.ID, rectTransform);
+                _viewLayers.Add(viewLayer.ID, uiBlock2D);
             }
         }
 
         private void DeinitViewMapper()
         {
             // destroy all current view layers
-            for (int i = 0; i < _canvas.transform.childCount; i++)
+            for (int i = 0; i < _uiBlock2D.transform.childCount; i++)
             {
-                Destroy(_canvas.transform.GetChild(0).gameObject);
+                Destroy(_uiBlock2D.transform.GetChild(0).gameObject);
             }
             _viewLayers.Clear();
             _views.Clear();
@@ -93,7 +106,7 @@ namespace VED.Utilities
                 return null;
             }
 
-            T instance = Instantiate((T)viewData.Prefab, _viewLayers[viewData.LayerID]);
+            T instance = Instantiate((T)viewData.Prefab, _viewLayers[viewData.LayerID].transform);
             _views.Add(type, instance);
 
             OrderViewLayer(viewData.LayerID);
@@ -114,8 +127,15 @@ namespace VED.Utilities
 
         private void OrderViewLayer(string id)
         {
-            ViewLayer viewLayer = _viewMapper.ViewLayers.Find(l => l.ID == id);
-            Transform viewLayerTransform = _viewLayers[id];
+            ViewLayer viewLayer = null;
+            for (int i = 0; i < _viewMapper.ViewLayers.Count; i++)
+            {
+                if (_viewMapper.ViewLayers[i].ID == id)
+                {
+                    viewLayer = _viewMapper.ViewLayers[i];
+                    break;
+                }
+            }
 
             foreach (View view in viewLayer.Views)
             {
