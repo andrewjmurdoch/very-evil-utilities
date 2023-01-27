@@ -1,3 +1,4 @@
+using Nova;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,7 +30,7 @@ namespace VED.Utilities
 
         private Dictionary<Type, Transition> _transitions = new Dictionary<Type, Transition>();
 
-        private Canvas _canvas = null;
+        private Transform _root = null;
 
         protected override void Awake()
         {
@@ -40,15 +41,16 @@ namespace VED.Utilities
 
             TransitionView transitionView = ViewManager.Instance.GetView<TransitionView>();
             transitionView.Show();
-            _canvas = transitionView.Canvas;
+            _root = transitionView.transform;
         }
 
         private void DeinitTransitionMapper()
         {
             // destroy all current transitions
-            for (int i = 0; i < _canvas.transform.childCount; i++)
+            int count = _root.transform.childCount;
+            for (int i = 0; i < count; i++)
             {
-                Destroy(_canvas.transform.GetChild(0).gameObject);
+                Destroy(_root.transform.GetChild(0).gameObject);
             }
         }
 
@@ -173,7 +175,7 @@ namespace VED.Utilities
                 return null;
             }
 
-            T instance = Instantiate((T)original, _canvas.transform);
+            T instance = Instantiate((T)original, _root);
             _transitions.Add(type, instance);
 
             return instance;

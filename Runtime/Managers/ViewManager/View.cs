@@ -12,7 +12,7 @@ namespace VED.Utilities
         public abstract void Hide(Action callback = null);
 
         public UIBlock2D UIBlock2D => _uiBlock2D;
-        private UIBlock2D _uiBlock2D = null;
+        protected UIBlock2D _uiBlock2D = null;
 
         public virtual void Awake()
         {
