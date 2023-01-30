@@ -51,6 +51,7 @@ namespace VED.Utilities
 
             _screenSpace = _uiBlock2D.gameObject.AddComponent<ScreenSpace>();
             _screenSpace.TargetCamera = _camera;
+            _screenSpace.Mode = ScreenSpace.FillMode.MatchCameraResolution;
         }
 
         private void InitViewMapper(ViewMapper viewMapper)
