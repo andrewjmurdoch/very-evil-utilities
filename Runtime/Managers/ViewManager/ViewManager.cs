@@ -27,9 +27,13 @@ namespace VED.Utilities
         public Dictionary<string, UIBlock2D> ViewLayers => _viewLayers;
         private Dictionary<string, UIBlock2D> _viewLayers = new Dictionary<string, UIBlock2D>();
 
+        public UIBlock2D UIBlock2D => _uiBlock2D;
         private UIBlock2D _uiBlock2D = null;
-        private ScreenSpace _screenSpace = null;
+
+        public Camera Camera => _camera;
         private Camera _camera = null;
+
+        private ScreenSpace _screenSpace = null;
 
         protected override void Awake()
         {
