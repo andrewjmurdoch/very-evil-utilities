@@ -28,11 +28,6 @@ namespace VED.Utilities
                 {
                     callback?.Invoke(result);
                     OnPop?.Invoke(result);
-
-                    if (_stateStack.TryPeek(out result))
-                    {
-                        result.Enter(null);
-                    }
                 });
             }
         }
