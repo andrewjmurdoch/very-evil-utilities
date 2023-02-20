@@ -22,7 +22,7 @@ namespace VED.Utilities
         protected Func<bool> _function = null;
         protected Action _callback = null;
         protected bool _recursive = false;
-        protected TimeManager.TimeState _timeState = null;
+        protected int _timeStateIndex = 0;
 
         public Awaiter(float timeout = 0)
         {
@@ -32,7 +32,7 @@ namespace VED.Utilities
 
         public virtual void Reset()
         {
-            TimeManager.Instance.RemoveAwaiter(this, _timeState);
+            TimeManager.Instance.RemoveAwaiter(this, _timeStateIndex);
 
             _function = null;
             _callback = null;
@@ -49,7 +49,7 @@ namespace VED.Utilities
             _recursive = true;
             _function  = function;
             _callback  = callback;
-            _timeState = TimeManager.Instance.GetTimeState();
+            _timeStateIndex = TimeManager.Instance.TimeStates.Count - 1;
             _timeout   = timeout == 0 ? _defaultTimeout : timeout;
 
             TimeManager.Instance.AddAwaiter(this);

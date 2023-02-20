@@ -26,7 +26,6 @@ namespace VED.Utilities
             _recursive = true;
             _function = function;
             _callback = callback;
-            _timeState = TimeManager.Instance.GetTimeState();
             _timeout = timeout == 0 ? _defaultTimeout : timeout;
 
             TimeManager.Instance.AddAwaiter(this);

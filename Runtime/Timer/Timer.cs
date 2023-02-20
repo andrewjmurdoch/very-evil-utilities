@@ -27,7 +27,7 @@ namespace VED.Utilities
         protected Action _callback = null;
 
         protected bool _recursive = false;
-        protected TimeManager.TimeState _timeState = null;
+        protected int _timeStateIndex = 0;
 
         public Timer(float duration = 0)
         {
@@ -38,7 +38,7 @@ namespace VED.Utilities
 
         public virtual void Reset()
         {
-            TimeManager.Instance.RemoveTimer(this, _timeState);
+            TimeManager.Instance.RemoveTimer(this, _timeStateIndex);
 
             _time = _defaultDuration;
             _tick = null;
@@ -54,7 +54,7 @@ namespace VED.Utilities
 
             _time = 0f;
             _recursive = true;
-            _timeState = TimeManager.Instance.GetTimeState();
+            _timeStateIndex = TimeManager.Instance.TimeStates.Count - 1;
             _tick = tick;
             _callback = callback;
             _duration = (duration != 0) ? duration : _defaultDuration;

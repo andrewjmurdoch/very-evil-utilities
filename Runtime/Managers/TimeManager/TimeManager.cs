@@ -6,12 +6,18 @@ namespace VED.Utilities
     {
         public TimeManager() : base()
         {
+            _defaultTimeState = new TimeState();
+            _realTimeState = new TimeState();
+            _timeStates = new List<TimeState> { _defaultTimeState };
+
+            GameManager.Instance.StateManager.OnPush += OnPush;
             GameManager.Instance.StateManager.OnPop += OnPop;
         }
 
-        private Dictionary<State, TimeState> _timeStates = new Dictionary<State, TimeState>();
-        private TimeState _defaultTimeState = new TimeState();
-        private TimeState _realTimeState = new TimeState();
+        public IReadOnlyList<TimeState> TimeStates => _timeStates;
+        private List<TimeState> _timeStates = null;
+        private TimeState _defaultTimeState = null;
+        private TimeState _realTimeState = null;
 
         public class TimeState
         {
@@ -28,12 +34,14 @@ namespace VED.Utilities
             public List<Stopwatch> StopwatchesRemoved = new List<Stopwatch>();
         }
 
-        public void OnPop(State state)
+        private void OnPush()
         {
-            if (_timeStates.ContainsKey(state))
-            {
-                _timeStates.Remove(state);
-            }
+            _timeStates.Add(new TimeState());
+        }
+
+        private void OnPop(State state)
+        {
+            _timeStates.Remove(_timeStates[^1]);
         }
 
         public void Tick()
@@ -44,23 +52,10 @@ namespace VED.Utilities
             TickStopwatches(_realTimeState);
 
             // update scaled time
-            TimeState timeState = GetTimeState();
+            TimeState timeState = _timeStates[^1];
             TickTimers(timeState);
             TickAwaiters(timeState);
             TickStopwatches(timeState);
-        }
-
-        public TimeState GetTimeState()
-        {
-            if (GameManager.Instance.StateManager.TryPeek(out State result))
-            {
-                if (_timeStates.ContainsKey(result))
-                {
-                    return _timeStates[result];
-                }
-                _timeStates.Add(result, new TimeState());
-            };
-            return _defaultTimeState;
         }
 
         private void TickTimers(TimeState timeState)
@@ -93,8 +88,7 @@ namespace VED.Utilities
         #region Add/Remove
         public void AddTimer(Timer timer)
         {
-            TimeState timeState = GetTimeState();
-            timeState.TimersAdded.Add(timer);
+            _timeStates[^1].TimersAdded.Add(timer);
         }
 
         public void AddTimer(TimerRealtime timer)
@@ -102,10 +96,10 @@ namespace VED.Utilities
             _realTimeState.TimersAdded.Add(timer);
         }
 
-        public void RemoveTimer(Timer timer, TimeState timeState)
+        public void RemoveTimer(Timer timer, int timeStateIndex)
         {
-            if (timeState == null) return;
-            timeState.TimersRemoved.Add(timer);
+            if (timeStateIndex >= _timeStates.Count) return;
+            _timeStates[timeStateIndex].TimersRemoved.Add(timer);
         }
 
         public void RemoveTimer(TimerRealtime timer)
@@ -115,8 +109,7 @@ namespace VED.Utilities
 
         public void AddAwaiter(Awaiter awaiter)
         {
-            TimeState timeState = GetTimeState();
-            timeState.AwaitersAdded.Add(awaiter);
+            _timeStates[^1].AwaitersAdded.Add(awaiter);
         }
 
         public void AddAwaiter(AwaiterRealtime awaiter)
@@ -124,10 +117,10 @@ namespace VED.Utilities
             _realTimeState.AwaitersAdded.Add(awaiter);
         }
 
-        public void RemoveAwaiter(Awaiter awaiter, TimeState timeState)
+        public void RemoveAwaiter(Awaiter awaiter, int timeStateIndex)
         {
-            if (timeState == null) return;
-            timeState.AwaitersRemoved.Add(awaiter);
+            if (timeStateIndex >= _timeStates.Count) return;
+            _timeStates[timeStateIndex].AwaitersRemoved.Add(awaiter);
         }
 
         public void RemoveAwaiter(AwaiterRealtime awaiter)
@@ -137,8 +130,7 @@ namespace VED.Utilities
 
         public void AddStopwatch(Stopwatch stopwatch)
         {
-            TimeState timeState = GetTimeState();
-            timeState.StopwatchesAdded.Add(stopwatch);
+            _timeStates[^1].StopwatchesAdded.Add(stopwatch);
         }
 
         public void AddStopwatch(StopwatchRealtime stopwatch)
@@ -146,10 +138,10 @@ namespace VED.Utilities
             _realTimeState.StopwatchesAdded.Add(stopwatch);
         }
 
-        public void RemoveStopwatch(Stopwatch stopwatch, TimeState timeState)
+        public void RemoveStopwatch(Stopwatch stopwatch, int timeStateIndex)
         {
-            if (timeState == null) return;
-            timeState.StopwatchesRemoved.Add(stopwatch);
+            if (timeStateIndex >= _timeStates.Count) return;
+            _timeStates[timeStateIndex].StopwatchesRemoved.Add(stopwatch);
         }
 
         public void RemoveStopwatch(StopwatchRealtime stopwatch)

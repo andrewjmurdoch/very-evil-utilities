@@ -12,19 +12,19 @@ namespace VED.Utilities
         public bool Running => _running;
         [SerializeField, ReadOnly] protected bool _running = false;
 
-        protected TimeManager.TimeState _timeState = null;
+        protected int _timeStateIndex = 0;
 
         public virtual void Start()
         {
             _running = true;
-            _timeState = TimeManager.Instance.GetTimeState();
+            _timeStateIndex = TimeManager.Instance.TimeStates.Count - 1;
             TimeManager.Instance.AddStopwatch(this);
         }
 
         public virtual void Stop()
         {
             _running = false;
-            TimeManager.Instance.RemoveStopwatch(this, _timeState);
+            TimeManager.Instance.RemoveStopwatch(this, _timeStateIndex);
         }
 
         public virtual void Restart()
