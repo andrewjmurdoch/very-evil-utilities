@@ -8,7 +8,12 @@ namespace VED.Utilities
         {
             _defaultTimeState = new TimeState();
             _realTimeState = new TimeState();
+
             _timeStates = new List<TimeState> { _defaultTimeState };
+            for (int i = 0; i < GameManager.Instance.StateManager.Stack.Count; i++)
+            {
+                _timeStates.Add(new TimeState());
+            }
 
             GameManager.Instance.StateManager.OnPush += OnPush;
             GameManager.Instance.StateManager.OnPop += OnPop;

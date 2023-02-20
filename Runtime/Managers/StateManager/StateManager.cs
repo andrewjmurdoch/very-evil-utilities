@@ -5,7 +5,8 @@ namespace VED.Utilities
 {
     public class StateManager
     {
-        private Stack<State> _stateStack = new Stack<State>();
+        public IReadOnlyCollection<State> Stack => _stack;
+        private Stack<State> _stack = new Stack<State>();
 
         public Action OnPush = null;
         public Action<State> OnPop  = null;
@@ -14,7 +15,7 @@ namespace VED.Utilities
         {
             state.Enter(() =>
             {
-                _stateStack.Push(state);
+                _stack.Push(state);
                 callback?.Invoke();
                 OnPush?.Invoke();
             });
@@ -22,7 +23,7 @@ namespace VED.Utilities
 
         public void Pop(Action<State> callback = null)
         {
-            if (_stateStack.TryPop(out State result))
+            if (_stack.TryPop(out State result))
             {
                 result.Exit(() =>
                 {
@@ -35,7 +36,7 @@ namespace VED.Utilities
         public bool TryPeek(out State result)
         {
             result = null;
-            if (_stateStack.TryPeek(out result))
+            if (_stack.TryPeek(out result))
             {
                 return true; 
             }
@@ -44,12 +45,12 @@ namespace VED.Utilities
 
         public void Tick()
         {
-            if (_stateStack.TryPeek(out State result)) result.Tick();
+            if (_stack.TryPeek(out State result)) result.Tick();
         }
 
         public void FixedTick()
         {
-            if (_stateStack.TryPeek(out State result)) result.FixedTick();
+            if (_stack.TryPeek(out State result)) result.FixedTick();
         }
     }
 }
