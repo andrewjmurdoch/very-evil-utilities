@@ -16,8 +16,8 @@ namespace VED.Utilities
             state.Enter(() =>
             {
                 _stack.Push(state);
-                callback?.Invoke();
                 OnPush?.Invoke();
+                callback?.Invoke();
             });
         }
 
@@ -27,8 +27,8 @@ namespace VED.Utilities
             {
                 result.Exit(() =>
                 {
-                    callback?.Invoke(result);
                     OnPop?.Invoke(result);
+                    callback?.Invoke(result);
                 });
             }
         }

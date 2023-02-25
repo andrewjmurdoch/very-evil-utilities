@@ -26,17 +26,34 @@ namespace VED.Utilities
 
         public class TimeState
         {
+            public enum Action
+            {
+                ADD,
+                REMOVE
+            }
+
+            public class TimeStateAction<T>
+            {
+                public TimeStateAction(T value, Action action)
+                {
+                    Value = value;
+                    Action = action;
+                }
+
+                public T Value;
+                public Action Action = Action.ADD;
+            }
+
+
             public List<Timer> Timers = new List<Timer>();
-            public List<Timer> TimersAdded = new List<Timer>();
-            public List<Timer> TimersRemoved = new List<Timer>();
+            public List<TimeStateAction<Timer>> TimeStateActionsTimer = new List<TimeStateAction<Timer>>();
 
             public List<Awaiter> Awaiters = new List<Awaiter>();
-            public List<Awaiter> AwaitersAdded = new List<Awaiter>();
-            public List<Awaiter> AwaitersRemoved = new List<Awaiter>();
+            public List<TimeStateAction<Awaiter>> TimeStateActionsAwaiter = new List<TimeStateAction<Awaiter>>();
 
             public List<Stopwatch> Stopwatches = new List<Stopwatch>();
-            public List<Stopwatch> StopwatchesAdded = new List<Stopwatch>();
-            public List<Stopwatch> StopwatchesRemoved = new List<Stopwatch>();
+            public List<TimeStateAction<Stopwatch>> TimeStateActionsStopwatch = new List<TimeStateAction<Stopwatch>>();
+
         }
 
         private void OnPush()
@@ -65,93 +82,126 @@ namespace VED.Utilities
 
         private void TickTimers(TimeState timeState)
         {
-            timeState.TimersRemoved.ForEach(t => timeState.Timers.Remove(t));
-            timeState.TimersRemoved.Clear();
-            timeState.TimersAdded.ForEach(t => timeState.Timers.Add(t));
-            timeState.TimersAdded.Clear();
+            for (int i = 0; i < timeState.TimeStateActionsTimer.Count; i++)
+            {
+                if (timeState.TimeStateActionsTimer[i].Action == TimeState.Action.ADD)
+                {
+                    timeState.Timers.Add(timeState.TimeStateActionsTimer[i].Value);
+                    continue;
+                }
+
+                if (timeState.TimeStateActionsTimer[i].Action == TimeState.Action.REMOVE)
+                {
+                    timeState.Timers.Remove(timeState.TimeStateActionsTimer[i].Value);
+                    continue;
+                }
+            }
+            timeState.TimeStateActionsTimer.Clear();
             timeState.Timers.ForEach(t => t.Tick());
         }
 
         private void TickAwaiters(TimeState timeState)
         {
-            timeState.AwaitersRemoved.ForEach(a => timeState.Awaiters.Remove(a));
-            timeState.AwaitersRemoved.Clear();
-            timeState.AwaitersAdded.ForEach(a => timeState.Awaiters.Add(a));
-            timeState.AwaitersAdded.Clear();
+            for (int i = 0; i < timeState.TimeStateActionsAwaiter.Count; i++)
+            {
+                if (timeState.TimeStateActionsAwaiter[i].Action == TimeState.Action.ADD)
+                {
+                    timeState.Awaiters.Add(timeState.TimeStateActionsAwaiter[i].Value);
+                    continue;
+                }
+
+                if (timeState.TimeStateActionsAwaiter[i].Action == TimeState.Action.REMOVE)
+                {
+                    timeState.Awaiters.Remove(timeState.TimeStateActionsAwaiter[i].Value);
+                    continue;
+                }
+            }
+            timeState.TimeStateActionsAwaiter.Clear();
             timeState.Awaiters.ForEach(a => a.Tick());
         }
 
         private void TickStopwatches(TimeState timeState)
         {
-            timeState.StopwatchesRemoved.ForEach(s => timeState.Stopwatches.Remove(s));
-            timeState.StopwatchesRemoved.Clear();
-            timeState.StopwatchesAdded.ForEach(s => timeState.Stopwatches.Add(s));
-            timeState.StopwatchesAdded.Clear();
+            for (int i = 0; i < timeState.TimeStateActionsStopwatch.Count; i++)
+            {
+                if (timeState.TimeStateActionsStopwatch[i].Action == TimeState.Action.ADD)
+                {
+                    timeState.Stopwatches.Add(timeState.TimeStateActionsStopwatch[i].Value);
+                    continue;
+                }
+
+                if (timeState.TimeStateActionsStopwatch[i].Action == TimeState.Action.REMOVE)
+                {
+                    timeState.Stopwatches.Remove(timeState.TimeStateActionsStopwatch[i].Value);
+                    continue;
+                }
+            }
+            timeState.TimeStateActionsStopwatch.Clear();
             timeState.Stopwatches.ForEach(s => s.Tick());
         }
 
         #region Add/Remove
         public void AddTimer(Timer timer)
         {
-            _timeStates[^1].TimersAdded.Add(timer);
+            _timeStates[^1].TimeStateActionsTimer.Add(new TimeState.TimeStateAction<Timer>(timer, TimeState.Action.ADD));
         }
 
         public void AddTimer(TimerRealtime timer)
         {
-            _realTimeState.TimersAdded.Add(timer);
+            _realTimeState.TimeStateActionsTimer.Add(new TimeState.TimeStateAction<Timer>(timer, TimeState.Action.ADD));
         }
 
         public void RemoveTimer(Timer timer, int timeStateIndex)
         {
             if (timeStateIndex >= _timeStates.Count) return;
-            _timeStates[timeStateIndex].TimersRemoved.Add(timer);
+            _timeStates[timeStateIndex].TimeStateActionsTimer.Add(new TimeState.TimeStateAction<Timer>(timer, TimeState.Action.REMOVE));
         }
 
         public void RemoveTimer(TimerRealtime timer)
         {
-            _realTimeState.TimersRemoved.Add(timer);
+            _realTimeState.TimeStateActionsTimer.Add(new TimeState.TimeStateAction<Timer>(timer, TimeState.Action.REMOVE));
         }
 
         public void AddAwaiter(Awaiter awaiter)
         {
-            _timeStates[^1].AwaitersAdded.Add(awaiter);
+            _timeStates[^1].TimeStateActionsAwaiter.Add(new TimeState.TimeStateAction<Awaiter>(awaiter, TimeState.Action.ADD));
         }
 
         public void AddAwaiter(AwaiterRealtime awaiter)
         {
-            _realTimeState.AwaitersAdded.Add(awaiter);
+            _realTimeState.TimeStateActionsAwaiter.Add(new TimeState.TimeStateAction<Awaiter>(awaiter, TimeState.Action.ADD));
         }
 
         public void RemoveAwaiter(Awaiter awaiter, int timeStateIndex)
         {
             if (timeStateIndex >= _timeStates.Count) return;
-            _timeStates[timeStateIndex].AwaitersRemoved.Add(awaiter);
+            _timeStates[timeStateIndex].TimeStateActionsAwaiter.Add(new TimeState.TimeStateAction<Awaiter>(awaiter, TimeState.Action.REMOVE));
         }
 
         public void RemoveAwaiter(AwaiterRealtime awaiter)
         {
-            _realTimeState.AwaitersRemoved.Add(awaiter);
+            _realTimeState.TimeStateActionsAwaiter.Add(new TimeState.TimeStateAction<Awaiter>(awaiter, TimeState.Action.REMOVE));
         }
 
         public void AddStopwatch(Stopwatch stopwatch)
         {
-            _timeStates[^1].StopwatchesAdded.Add(stopwatch);
+            _timeStates[^1].TimeStateActionsStopwatch.Add(new TimeState.TimeStateAction<Stopwatch>(stopwatch, TimeState.Action.ADD));
         }
 
         public void AddStopwatch(StopwatchRealtime stopwatch)
         {
-            _realTimeState.StopwatchesAdded.Add(stopwatch);
+            _realTimeState.TimeStateActionsStopwatch.Add(new TimeState.TimeStateAction<Stopwatch>(stopwatch, TimeState.Action.ADD));
         }
 
         public void RemoveStopwatch(Stopwatch stopwatch, int timeStateIndex)
         {
             if (timeStateIndex >= _timeStates.Count) return;
-            _timeStates[timeStateIndex].StopwatchesRemoved.Add(stopwatch);
+            _timeStates[timeStateIndex].TimeStateActionsStopwatch.Add(new TimeState.TimeStateAction<Stopwatch>(stopwatch, TimeState.Action.REMOVE));
         }
 
         public void RemoveStopwatch(StopwatchRealtime stopwatch)
         {
-            _realTimeState.StopwatchesRemoved.Add(stopwatch);
+            _realTimeState.TimeStateActionsStopwatch.Add(new TimeState.TimeStateAction<Stopwatch>(stopwatch, TimeState.Action.REMOVE));
         }
         #endregion
     }
