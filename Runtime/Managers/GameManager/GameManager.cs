@@ -11,6 +11,11 @@ namespace VED.Utilities
             _stateManager.Tick();
         }
 
+        private void LateUpdate()
+        {
+            _stateManager.LateTick();
+        }
+
         private void FixedUpdate()
         {
             _stateManager.FixedTick();

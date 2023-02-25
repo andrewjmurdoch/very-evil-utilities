@@ -48,6 +48,11 @@ namespace VED.Utilities
             if (_stack.TryPeek(out State result)) result.Tick();
         }
 
+        public void LateTick()
+        {
+            if (_stack.TryPeek(out State result)) result.LateTick();
+        }
+
         public void FixedTick()
         {
             if (_stack.TryPeek(out State result)) result.FixedTick();
