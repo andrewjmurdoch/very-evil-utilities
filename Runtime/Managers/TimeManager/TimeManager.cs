@@ -54,7 +54,7 @@ namespace VED.Utilities
             public List<TimeStateAction<Stopwatch>> TimeStateActionsStopwatch = new List<TimeStateAction<Stopwatch>>();
         }
 
-        private void OnPush()
+        private void OnPush(State state)
         {
             _timeStates.Add(new TimeState());
         }

@@ -8,29 +8,23 @@ namespace VED.Utilities
         public IReadOnlyCollection<State> Stack => _stack;
         private Stack<State> _stack = new Stack<State>();
 
-        public Action OnPush = null;
+        public Action<State> OnPush = null;
         public Action<State> OnPop  = null;
 
-        public void Push(State state, Action callback = null)
+        public void Push(State state)
         {
-            state.Enter(() =>
-            {
-                _stack.Push(state);
-                OnPush?.Invoke();
-                callback?.Invoke();
-            });
+            _stack.Push(state);
+            OnPush?.Invoke(state);
         }
 
-        public void Pop(Action<State> callback = null)
+        public State Pop()
         {
             if (_stack.TryPop(out State result))
             {
-                result.Exit(() =>
-                {
-                    OnPop?.Invoke(result);
-                    callback?.Invoke(result);
-                });
+                OnPop?.Invoke(result);
+                return result;
             }
+            return null;
         }
 
         public bool TryPeek(out State result)
