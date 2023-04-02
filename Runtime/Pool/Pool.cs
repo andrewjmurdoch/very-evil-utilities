@@ -20,6 +20,23 @@ namespace VED.Utilities
 
         private const int INITIAL_SIZE = 30;
 
+        public Pool() { }
+
+        public Pool(T original, Transform parent, int size = INITIAL_SIZE)
+        {
+            _original = original;
+
+            // create transform to hold pooled objects
+            _transform = new GameObject(typeof(T).ToString() + " Pool").transform;
+            _transform.SetParent(parent);
+            _transform.gameObject.SetActive(false);
+
+            _init = null;
+            _deinit = null;
+
+            Extend(size);
+        }
+
         public void Init(T original, Transform parent, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
         {
             _original = original;
