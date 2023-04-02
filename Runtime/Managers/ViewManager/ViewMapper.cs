@@ -26,26 +26,24 @@ namespace VED.Utilities
             private View _prefab = null;
         }
 
-        public const string PATH = "Packages/com.veryevildemons.veryevilutilities/Assets/ViewManager/ViewMapper.asset";
-
         public List<ViewLayer> ViewLayers => _viewLayers;
         [SerializeField] private List<ViewLayer> _viewLayers = new List<ViewLayer>();
 
-        private Dictionary<Type, ViewData> _viewTypeDictionary = new Dictionary<Type, ViewData>();
+        [SerializeField] private Dictionary<Type, ViewData> _viewTypeDictionary = null;
 
         public ViewData this[Type type]
         {
             get
             {
+                if (_viewTypeDictionary == null) InitViewTypeDictionary();
                 if (!_viewTypeDictionary.ContainsKey(type)) return null;
                 return _viewTypeDictionary[type];
             }
         }
 
-#if UNITY_EDITOR
-        public void OnValidate()
+        private void InitViewTypeDictionary()
         {
-            _viewTypeDictionary.Clear();
+            _viewTypeDictionary = new Dictionary<Type, ViewData>();
 
             foreach (ViewLayer viewLayer in _viewLayers)
             {
@@ -63,6 +61,5 @@ namespace VED.Utilities
                 }
             }
         }
-#endif
     }
 }

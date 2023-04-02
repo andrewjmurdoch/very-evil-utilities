@@ -1,4 +1,3 @@
-using Nova;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,8 +24,8 @@ namespace VED.Utilities
         private const float DEFAULT_DURATION = 0.5f;
         private const float DEFAULT_TIMEOUT = 200f;
 
-        private Timer _timer = null;
-        private Awaiter _awaiter = null;
+        private TimerRealtime _timer = new TimerRealtime(DEFAULT_DURATION);
+        private AwaiterRealtime _awaiter = new AwaiterRealtime(DEFAULT_TIMEOUT);
 
         private Dictionary<Type, Transition> _transitions = new Dictionary<Type, Transition>();
 
@@ -35,9 +34,6 @@ namespace VED.Utilities
         protected override void Awake()
         {
             base.Awake();
-
-            _timer = new Timer(DEFAULT_DURATION);
-            _awaiter = new Awaiter(DEFAULT_TIMEOUT);
 
             TransitionView transitionView = ViewManager.Instance.GetView<TransitionView>();
             transitionView.Show();

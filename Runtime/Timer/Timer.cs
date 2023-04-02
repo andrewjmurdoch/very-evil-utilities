@@ -34,6 +34,7 @@ namespace VED.Utilities
             _time = duration;
             _duration = duration;
             _defaultDuration = duration;
+            _timeStateIndex = TimeManager.Instance.TimeStates.Count - 1;
         }
 
         public virtual void Reset()

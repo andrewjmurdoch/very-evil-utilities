@@ -1,8 +1,7 @@
+using Nova;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using Nova;
 
 namespace VED.Utilities
 {
@@ -10,9 +9,9 @@ namespace VED.Utilities
     {
         public ViewMapper ViewMapper
         {
-            get 
-            { 
-                return _viewMapper; 
+            get
+            {
+                return _viewMapper;
             }
             set
             {
@@ -59,7 +58,7 @@ namespace VED.Utilities
         }
 
         private void InitViewMapper(ViewMapper viewMapper)
-        { 
+        {
             _viewMapper = viewMapper;
 
             foreach (ViewLayer viewLayer in _viewMapper.ViewLayers)

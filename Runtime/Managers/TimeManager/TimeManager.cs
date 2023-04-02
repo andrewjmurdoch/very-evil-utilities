@@ -44,7 +44,6 @@ namespace VED.Utilities
                 public Action Action = Action.ADD;
             }
 
-
             public List<Timer> Timers = new List<Timer>();
             public List<TimeStateAction<Timer>> TimeStateActionsTimer = new List<TimeStateAction<Timer>>();
 
@@ -53,7 +52,6 @@ namespace VED.Utilities
 
             public List<Stopwatch> Stopwatches = new List<Stopwatch>();
             public List<TimeStateAction<Stopwatch>> TimeStateActionsStopwatch = new List<TimeStateAction<Stopwatch>>();
-
         }
 
         private void OnPush()
