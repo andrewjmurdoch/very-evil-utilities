@@ -1,6 +1,4 @@
 using Nova;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VED.Utilities
@@ -8,9 +6,6 @@ namespace VED.Utilities
     [RequireComponent(typeof(UIBlock2D))]
     public abstract class View : MonoBehaviour
     {
-        public abstract void Show(Action callback = null);
-        public abstract void Hide(Action callback = null);
-
         public UIBlock2D UIBlock2D => _uiBlock2D;
         protected UIBlock2D _uiBlock2D = null;
 
@@ -26,6 +21,16 @@ namespace VED.Utilities
             {
                 uiBlocks[i].GameObjectLayer = layer;
             }
+        }
+
+        public virtual void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public virtual void Show()
+        {
+            gameObject.SetActive(true);
         }
     }
 }

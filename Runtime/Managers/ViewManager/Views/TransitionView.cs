@@ -6,16 +6,14 @@ namespace VED.Utilities
 {
     public class TransitionView : View
     {
-        public override void Show(Action callback = null)
+        public override void Show()
         {
             _uiBlock2D.Visible = true;
-            callback?.Invoke();
         }
 
-        public override void Hide(Action callback = null)
+        public override void Hide()
         {
             _uiBlock2D.Visible = false;
-            callback?.Invoke();
         }
     }
 }
