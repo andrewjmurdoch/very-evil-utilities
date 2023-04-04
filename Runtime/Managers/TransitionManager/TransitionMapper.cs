@@ -16,8 +16,8 @@ namespace VED.Utilities
             get
             {
                 if (_transitionTypeDictionary == null) InitTransitionTypeDictionary();
-                if (!_transitionTypeDictionary.ContainsKey(type)) return null;
-                return _transitionTypeDictionary[type];
+                if (_transitionTypeDictionary.TryGetValue(type, out Transition transition)) return transition;
+                return null;
             }
         }
 

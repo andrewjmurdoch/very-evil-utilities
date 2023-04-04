@@ -36,8 +36,8 @@ namespace VED.Utilities
             get
             {
                 if (_viewTypeDictionary == null) InitViewTypeDictionary();
-                if (!_viewTypeDictionary.ContainsKey(type)) return null;
-                return _viewTypeDictionary[type];
+                if (_viewTypeDictionary.TryGetValue(type, out ViewData viewData)) return viewData;
+                return null;
             }
         }
 
