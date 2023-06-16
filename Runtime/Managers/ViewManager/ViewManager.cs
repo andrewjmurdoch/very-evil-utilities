@@ -77,6 +77,7 @@ namespace VED.Utilities
                 uiBlock2D.BodyEnabled = false;
                 uiBlock2D.Size.Percent = new Vector3(1f, 1f, 1f);
                 uiBlock2D.GameObjectLayer = LayerMask.NameToLayer("UI");
+                uiBlock2D.gameObject.AddComponent<SortGroup>().SortingOrder = count;
 
                 _viewLayers.Add(viewLayer.ID, uiBlock2D);
             }
