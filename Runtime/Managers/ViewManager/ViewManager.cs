@@ -120,6 +120,7 @@ namespace VED.Utilities
             }
 
             T instance = Instantiate((T)viewData.Prefab, _viewLayers[viewData.LayerID].transform);
+            instance.Init();
             _views.Add(type, instance);
 
             OrderViewLayer(viewData.LayerID);

@@ -9,7 +9,7 @@ namespace VED.Utilities
         public UIBlock2D UIBlock2D => _uiBlock2D;
         protected UIBlock2D _uiBlock2D = null;
 
-        public virtual void Awake()
+        public virtual void Init()
         {
             int layer = LayerMask.NameToLayer("UI");
 
