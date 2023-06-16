@@ -61,11 +61,19 @@ namespace VED.Utilities
         {
             _viewMapper = viewMapper;
 
-            foreach (ViewLayer viewLayer in _viewMapper.ViewLayers)
+            int count = 0;
+            for (int i = 0; i < _viewMapper.ViewLayers.Count; i++)
             {
+                ViewLayer viewLayer = _viewMapper.ViewLayers[i];
+
+                if (i > 0) count += _viewMapper.ViewLayers[i - 1].Views.Count + 1;
+
                 UIBlock2D uiBlock2D = new GameObject(viewLayer.ID).AddComponent<UIBlock2D>();
-                uiBlock2D.transform.SetParent(_uiBlock2D.transform);
-                uiBlock2D.transform.SetAsLastSibling();
+                Transform uiBlock2DTransform = uiBlock2D.transform;
+
+                uiBlock2DTransform.SetParent(_uiBlock2D.transform);
+                uiBlock2DTransform.SetAsLastSibling();
+                uiBlock2D.ZIndex = (short)count;
                 uiBlock2D.BodyEnabled = false;
                 uiBlock2D.Size.Percent = new Vector3(1f, 1f, 1f);
                 uiBlock2D.GameObjectLayer = LayerMask.NameToLayer("UI");
@@ -132,6 +140,7 @@ namespace VED.Utilities
         private void OrderViewLayer(string id)
         {
             ViewLayer viewLayer = null;
+            int count = 1;
             for (int i = 0; i < _viewMapper.ViewLayers.Count; i++)
             {
                 if (_viewMapper.ViewLayers[i].ID == id)
@@ -139,15 +148,19 @@ namespace VED.Utilities
                     viewLayer = _viewMapper.ViewLayers[i];
                     break;
                 }
+
+                count += _viewMapper.ViewLayers[i].Views.Count + 1;
             }
 
-            foreach (View view in viewLayer.Views)
-            {
-                Type type = view.GetType();
+            for (int i = 0; i < viewLayer.Views.Count; i++)
+            { 
+                Type type = viewLayer.Views[i].GetType();
 
-                if (_views.TryGetValue(type, out View value))
+                if (_views.TryGetValue(type, out View view))
                 {
-                    value.transform.SetAsLastSibling();
+                    Transform viewTransform = view.transform;
+                    viewTransform.SetAsLastSibling();
+                    view.UIBlock2D.ZIndex = (short)(count + i);
                 }
             }
         }
