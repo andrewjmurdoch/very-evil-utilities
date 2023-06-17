@@ -64,6 +64,7 @@ namespace VED.Utilities
 
             _inactive.Clear();
             _active.Clear();
+            UnityEngine.Object.Destroy(_transform.gameObject);
         }
 
         public T Pop()
