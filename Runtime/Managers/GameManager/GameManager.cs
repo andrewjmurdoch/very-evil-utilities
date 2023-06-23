@@ -18,6 +18,7 @@ namespace VED.Utilities
 
         private void FixedUpdate()
         {
+            TimeManager.Instance.FixedTick();
             _stateManager.FixedTick();
         }
     }

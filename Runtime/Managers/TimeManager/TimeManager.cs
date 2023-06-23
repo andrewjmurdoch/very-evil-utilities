@@ -47,6 +47,9 @@ namespace VED.Utilities
             public List<Timer> Timers = new List<Timer>();
             public List<TimeStateAction<Timer>> TimeStateActionsTimer = new List<TimeStateAction<Timer>>();
 
+            public List<TimerFixed> TimersFixed = new List<TimerFixed>();
+            public List<TimeStateAction<TimerFixed>> TimeStateActionsTimerFixed = new List<TimeStateAction<TimerFixed>>();
+
             public List<Awaiter> Awaiters = new List<Awaiter>();
             public List<TimeStateAction<Awaiter>> TimeStateActionsAwaiter = new List<TimeStateAction<Awaiter>>();
 
@@ -78,6 +81,16 @@ namespace VED.Utilities
             TickStopwatches(timeState);
         }
 
+        public void FixedTick()
+        {
+            // update realtime 
+            TickTimersFixed(_realTimeState);
+
+            // update scaled time
+            TimeState timeState = _timeStates[^1];
+            TickTimersFixed(timeState);
+        }
+
         private void TickTimers(TimeState timeState)
         {
             for (int i = 0; i < timeState.TimeStateActionsTimer.Count; i++)
@@ -96,6 +109,26 @@ namespace VED.Utilities
             }
             timeState.TimeStateActionsTimer.Clear();
             timeState.Timers.ForEach(t => t.Tick());
+        }
+
+        private void TickTimersFixed(TimeState timeState)
+        {
+            for (int i = 0; i < timeState.TimeStateActionsTimerFixed.Count; i++)
+            {
+                if (timeState.TimeStateActionsTimerFixed[i].Action == TimeState.Action.ADD)
+                {
+                    timeState.TimersFixed.Add(timeState.TimeStateActionsTimerFixed[i].Value);
+                    continue;
+                }
+
+                if (timeState.TimeStateActionsTimerFixed[i].Action == TimeState.Action.REMOVE)
+                {
+                    timeState.TimersFixed.Remove(timeState.TimeStateActionsTimerFixed[i].Value);
+                    continue;
+                }
+            }
+            timeState.TimeStateActionsTimerFixed.Clear();
+            timeState.TimersFixed.ForEach(t => t.Tick());
         }
 
         private void TickAwaiters(TimeState timeState)
@@ -158,6 +191,17 @@ namespace VED.Utilities
         public void RemoveTimer(TimerRealtime timer)
         {
             _realTimeState.TimeStateActionsTimer.Add(new TimeState.TimeStateAction<Timer>(timer, TimeState.Action.REMOVE));
+        }
+
+        public void AddTimerFixed(TimerFixed timer)
+        {
+            _timeStates[^1].TimeStateActionsTimerFixed.Add(new TimeState.TimeStateAction<TimerFixed>(timer, TimeState.Action.ADD));
+        }
+
+        public void RemoveTimerFixed(TimerFixed timer, int timeStateIndex)
+        {
+            if (timeStateIndex >= _timeStates.Count) return;
+            _timeStates[timeStateIndex].TimeStateActionsTimerFixed.Add(new TimeState.TimeStateAction<TimerFixed>(timer, TimeState.Action.REMOVE));
         }
 
         public void AddAwaiter(Awaiter awaiter)
