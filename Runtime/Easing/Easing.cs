@@ -68,17 +68,17 @@ namespace VED.Utilities
 
         static float EaseInSine(float a, float b, float t)
         {
-            return -b * (float)Math.Cos(t / 1 * (Math.PI / 2)) + b + a;
+            return -b * (float)Math.Cos(t / 1f * (Math.PI / 2f)) + b + a;
         }
 
         static float EaseOutSine(float a, float b, float t)
         {
-            return b * (float)Math.Sin(t / 1 * (Math.PI / 2)) + a;
+            return b * (float)Math.Sin(t / 1f * (Math.PI / 2f)) + a;
         }
 
         static float EaseInOutSine(float a, float b, float t)
         {
-            return -b / 2 * ((float)Math.Cos(Math.PI * t / 1) - 1) + a;
+            return -b / 2f * ((float)Math.Cos(Math.PI * t / 1f) - 1f) + a;
         }
         #endregion
 
@@ -96,22 +96,22 @@ namespace VED.Utilities
 
         static float EaseInQuad(float a, float b, float t)
         {
-            return b * (t /= 1) * t + a;
+            return b * (t /= 1f) * t + a;
         }
 
         static float EaseOutQuad(float a, float b, float t)
         {
-            return -b * (t /= 1) * (t - 2) + a;
+            return -b * (t /= 1f) * (t - 2f) + a;
         }
 
         static float EaseInOutQuad(float a, float b, float t)
         {
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return b / 2 * t * t + a;
+                return b / 2f * t * t + a;
             }
 
-            return -b / 2 * ((--t) * (t - 2) - 1) + a;
+            return -b / 2f * ((--t) * (t - 2f) - 1f) + a;
         }
         #endregion
 
@@ -129,21 +129,21 @@ namespace VED.Utilities
 
         static float EaseInCubic(float a, float b, float t)
         {
-            return b * (t /= 1) * t * t + a;
+            return b * (t /= 1f) * t * t + a;
         }
 
         static float EaseOutCubic(float a, float b, float t)
         {
-            return b * ((t = t / 1 - 1) * t * t + 1) + a;
+            return b * ((t = t / 1f - 1f) * t * t + 1f) + a;
         }
 
         static float EaseInOutCubic(float a, float b, float t)
         {
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return b / 2 * t * t * t + a;
+                return b / 2f * t * t * t + a;
             }
-            return b / 2 * ((t -= 2) * t * t + 2) + a;
+            return b / 2f * ((t -= 2f) * t * t + 2f) + a;
         }
         #endregion
 
@@ -161,21 +161,21 @@ namespace VED.Utilities
 
         static float EaseInQuart(float a, float b, float t)
         {
-            return b * (t /= 1) * t * t * t + a;
+            return b * (t /= 1f) * t * t * t + a;
         }
 
         static float EaseOutQuart(float a, float b, float t)
         {
-            return -b * ((t = t / 1 - 1) * t * t * t - 1) + a;
+            return -b * ((t = t / 1f - 1f) * t * t * t - 1f) + a;
         }
 
         static float EaseInOutQuart(float a, float b, float t)
         {
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return b / 2 * t * t * t * t + a;
+                return b / 2f * t * t * t * t + a;
             }
-            return -b / 2 * ((t -= 2) * t * t * t - 2) + a;
+            return -b / 2f * ((t -= 2f) * t * t * t - 2f) + a;
         }
         #endregion
 
@@ -193,21 +193,21 @@ namespace VED.Utilities
 
         static float EaseInQuint(float a, float b, float t)
         {
-            return b * (t /= 1) * t * t * t * t + a;
+            return b * (t /= 1f) * t * t * t * t + a;
         }
 
         static float EaseOutQuint(float a, float b, float t)
         {
-            return b * ((t = t / 1 - 1) * t * t * t * t + 1) + a;
+            return b * ((t = t / 1f - 1f) * t * t * t * t + 1f) + a;
         }
 
         static float EaseInOutQuint(float a, float b, float t)
         {
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return b / 2 * t * t * t * t * t + a;
+                return b / 2f * t * t * t * t * t + a;
             }
-            return b / 2 * ((t -= 2) * t * t * t * t + 2) + a;
+            return b / 2f*  ((t -= 2f) * t * t * t * t + 2f) + a;
         }
         #endregion
 
@@ -231,7 +231,7 @@ namespace VED.Utilities
             }
             else
             {
-                return b * (float)Math.Pow(2, 10 * (t / 1 - 1)) + a;
+                return b * (float)Math.Pow(2f, 10f * (t / 1f - 1f)) + a;
             }
         }
 
@@ -243,25 +243,25 @@ namespace VED.Utilities
             }
             else
             {
-                return b * (-(float)Math.Pow(2, -10 * t / 1) + 1) + a;
+                return b * (-(float)Math.Pow(2f, -10f * t / 1f) + 1f) + a;
             }
         }
 
         static float EaseInOutExpo(float a, float b, float t)
         {
-            if (t == 0)
+            if (t == 0f)
             {
                 return a;
             }
-            else if (t == 1)
+            else if (t == 1f)
             {
                 return a + b;
             }
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return b / 2 * (float)Math.Pow(2, 10 * (t - 1)) + a;
+                return b / 2f * (float)Math.Pow(2f, 10f * (t - 1f)) + a;
             }
-            return b / 2 * (-(float)Math.Pow(2, -10 * --t) + 2) + a;
+            return b / 2f * (-(float)Math.Pow(2f, -10f * --t) + 2f) + a;
         }
         #endregion
 
@@ -279,21 +279,21 @@ namespace VED.Utilities
 
         static float EaseInCirc(float a, float b, float t)
         {
-            return -b * ((float)Math.Sqrt(1 - (t /= 1) * t) - 1) + a;
+            return -b * ((float)Math.Sqrt(1f - (t /= 1f) * t) - 1f) + a;
         }
 
         static float EaseOutCirc(float a, float b, float t)
         {
-            return b * (float)Math.Sqrt(1 - (t = t / 1 - 1) * t) + a;
+            return b * (float)Math.Sqrt(1f - (t = t / 1f - 1f) * t) + a;
         }
 
         static float EaseInOutCirc(float a, float b, float t)
         {
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return -b / 2 * ((float)Math.Sqrt(1 - t * t) - 1) + a;
+                return -b / 2f * ((float)Math.Sqrt(1f - t * t) - 1f) + a;
             }
-            return b / 2 * ((float)Math.Sqrt(1 - (t -= 2) * t) + 1) + a;
+            return b / 2f * ((float)Math.Sqrt(1f - (t -= 2f) * t) + 1f) + a;
         }
         #endregion
 
@@ -311,21 +311,21 @@ namespace VED.Utilities
 
         static float EaseInBack(float a, float b, float t, float s = 1.70158f)
         {
-            return b * (t /= 1) * t * ((s + 1) * t - s) + a;
+            return b * (t /= 1f) * t * ((s + 1f) * t - s) + a;
         }
 
         static float EaseOutBack(float a, float b, float t, float s = 1.70158f)
         {
-            return b * ((t = t / 1 - 1) * t * ((s + 1) * t + s) + 1) + a;
+            return b * ((t = t / 1f - 1f) * t * ((s + 1f) * t + s) + 1f) + a;
         }
 
         static float EaseInOutBack(float a, float b, float t, float s = 1.70158f)
         {
-            if ((t /= 1 / 2) < 1)
+            if ((t /= 1f / 2f) < 1f)
             {
-                return b / 2 * (t * t * (((s *= (1.525f)) + 1) * t - s)) + a;
+                return b / 2f * (t * t * (((s *= (1.525f)) + 1f) * t - s)) + a;
             }
-            return b / 2 * ((t -= 2) * t * (((s *= (1.525f)) + 1) * t + s) + 2) + a;
+            return b / 2f * ((t -= 2f) * t * (((s *= (1.525f)) + 1f) * t + s) + 2f) + a;
         }
         #endregion
 
@@ -343,59 +343,59 @@ namespace VED.Utilities
 
         static float EaseInElastic(float a, float b, float t)
         {
-            if (t == 0)
+            if (t == 0f)
             {
                 return a;
             }
-            if ((t /= 1) == 1)
+            if ((t /= 1f) == 1f)
             {
                 return a + b;
             }
-            float p = 1 * .3f;
+            float p = 1f * 0.3f;
             float i = b;
-            float s = p / 4;
-            float postFix = i * (float)Math.Pow(2, 10 * (t -= 1));
+            float s = p / 4f;
+            float postFix = i * (float)Math.Pow(2f, 10f * (t -= 1f));
 
-            return -(postFix * (float)Math.Sin((t * 1 - s) * (2 * Math.PI) / p)) + a;
+            return -(postFix * (float)Math.Sin((t * 1f - s) * (2f * Math.PI) / p)) + a;
         }
 
         static float EaseOutElastic(float a, float b, float t)
         {
-            if (t == 0)
+            if (t == 0f)
             {
                 return a;
             }
-            if ((t /= 1) == 1)
+            if ((t /= 1f) == 1f)
             {
                 return a + b;
             }
-            float p = 1 * .3f;
+            float p = 1f * 0.3f;
             float i = b;
-            float s = p / 4;
-            return (i * (float)Math.Pow(2, -10 * t) * (float)Math.Sin((t * 1 - s) * (2 * (float)Math.PI) / p) + b + a);
+            float s = p / 4f;
+            return (i * (float)Math.Pow(2f, -10f * t) * (float)Math.Sin((t * 1f - s) * (2f * (float)Math.PI) / p) + b + a);
         }
 
         static float EaseInOutElastic(float a, float b, float t)
         {
-            if (t == 0)
+            if (t == 0f)
             {
                 return a;
             }
-            if ((t /= 1 / 2) == 2)
+            if ((t /= 1f / 2f) == 2f)
             {
                 return a + b;
 
             }
 
-            float p = 1 * (.3f * 1.5f);
+            float p = 1f * (0.3f * 1.5f);
             float i = b;
-            float s = p / 4;
+            float s = p / 4f;
 
             if (t < 1)
             {
-                return -.5f * (i * (float)Math.Pow(2, 10 * (t -= 1)) * (float)Math.Sin((t * 1 - s) * (2 * (float)Math.PI) / p)) + a;
+                return -.5f * (i * (float)Math.Pow(2f, 10f * (t -= 1f)) * (float)Math.Sin((t * 1f - s) * (2f * (float)Math.PI) / p)) + a;
             }
-            return i * (float)Math.Pow(2, -10 * (t -= 1)) * (float)Math.Sin((t * 1 - s) * (2 * (float)Math.PI) / p) * .5f + b + a;
+            return i * (float)Math.Pow(2f, -10f * (t -= 1f)) * (float)Math.Sin((t * 1f - s) * (2f * (float)Math.PI) / p) * 0.5f + b + a;
         }
         #endregion
 
@@ -415,38 +415,38 @@ namespace VED.Utilities
         {
             b += a;
             a -= b;
-            return EaseOutBounce(b, a, 1 - t);
+            return EaseOutBounce(b, a, 1f - t);
         }
 
         static float EaseOutBounce(float a, float b, float t)
         {
-            if ((t /= 1) < (1 / 2.75f))
+            if ((t /= 1f) < (1f / 2.75f))
             {
                 return b * (7.5625f * t * t) + a;
             }
-            else if (t < (2 / 2.75f))
+            else if (t < (2f / 2.75f))
             {
-                return b * (7.5625f * (t -= (1.5f / 2.75f)) * t + .75f) + a;
+                return b * (7.5625f * (t -= (1.5f / 2.75f)) * t + 0.75f) + a;
             }
             else if (t < (2.5 / 2.75))
             {
-                return b * (7.5625f * (t -= (2.25f / 2.75f)) * t + .9375f) + a;
+                return b * (7.5625f * (t -= (2.25f / 2.75f)) * t + 0.9375f) + a;
             }
             else
             {
-                return b * (7.5625f * (t -= (2.625f / 2.75f)) * t + .984375f) + a;
+                return b * (7.5625f * (t -= (2.625f / 2.75f)) * t + 0.984375f) + a;
             }
         }
 
         static float EaseInOutBounce(float a, float b, float t)
         {
-            if (t < 1 / 2)
+            if (t < 1f / 2f)
             {
-                return EaseInBounce(0, b, t * 2) * .5f + a;
+                return EaseInBounce(0f, b, t * 2f) * 0.5f + a;
             }
             else
             {
-                return EaseOutBounce(0, b, t * 2 - 1) * .5f + b * .5f + a;
+                return EaseOutBounce(0f, b, t * 2f - 1) * 0.5f + b * 0.5f + a;
             }
         }
         #endregion
