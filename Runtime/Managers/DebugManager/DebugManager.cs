@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VED.Utilities
@@ -10,7 +12,7 @@ namespace VED.Utilities
 
         private const int MARGIN = 40;
         private const float HEIGHT = 0.05f;
-        private const float WIDTH  = 0.35f;
+        private const float WIDTH  = 0.45f;
         private Vector2 _scrollViewScrollPosition = Vector2.zero;
 
         private GUILayoutOption[] _options = { };
@@ -22,6 +24,7 @@ namespace VED.Utilities
         private GUIStyle _styleLabel = GUIStyle.none;
         private GUIStyle _styleButton = GUIStyle.none;
         private GUIStyle _styleText = GUIStyle.none;
+        private GUIStyle _styleTextHalf = GUIStyle.none;
         private GUIStyle _styleToggleOn = GUIStyle.none;
         private GUIStyle _styleToggleOff = GUIStyle.none;
         private GUIStyle _styleSlider = GUIStyle.none;
@@ -41,7 +44,7 @@ namespace VED.Utilities
             _styleBackground = new GUIStyle(GUI.skin.textField);
 
             _styleMargin = new GUIStyle(GUI.skin.label);
-            _styleMargin.fixedHeight = Screen.height * HEIGHT * 0.1f;
+            _styleMargin.fixedHeight = Screen.height * HEIGHT * 0.2f;
             _styleMargin.fixedWidth = Screen.width * WIDTH;
 
             _styleLabel = new GUIStyle(GUI.skin.label);
@@ -52,25 +55,31 @@ namespace VED.Utilities
             _styleButton = new GUIStyle(GUI.skin.button);
             _styleButton.fontSize = fontSize;
             _styleButton.fixedHeight = Screen.height * HEIGHT;
-            _styleLabel.fixedWidth   = Screen.width  * WIDTH;
+            _styleButton.fixedWidth   = Screen.width  * WIDTH;
 
             _styleText = new GUIStyle(GUI.skin.textField);
             _styleText.fontSize = fontSize;
             _styleText.fixedHeight = Screen.height * HEIGHT;
+            _styleText.fixedWidth = Screen.width * WIDTH;
+
+            _styleTextHalf = new GUIStyle(_styleText);
+            _styleTextHalf.fixedWidth = Screen.width * (WIDTH / 2.3f);
 
             _styleToggleOn = new GUIStyle(GUI.skin.button);
             _styleToggleOn.fontSize = fontSize;
             _styleToggleOn.normal.textColor = Color.green;
             _styleToggleOn.fixedHeight = Screen.height * HEIGHT;
+            _styleToggleOn.fixedWidth = Screen.width * WIDTH;
 
             _styleToggleOff = new GUIStyle(GUI.skin.button);
             _styleToggleOff.fontSize = fontSize;
             _styleToggleOff.normal.textColor = Color.red;
             _styleToggleOff.fixedHeight = Screen.height * HEIGHT;
+            _styleToggleOff.fixedWidth = Screen.width * WIDTH;
 
             _styleSlider = new GUIStyle(GUI.skin.horizontalSlider);
             _styleSlider.fontSize = fontSize;
-            _styleSlider.fixedWidth = Screen.width * 0.5f;
+            _styleSlider.fixedWidth = Screen.width * WIDTH;
             _styleSlider.fixedHeight = Screen.height * 0.035f;
 
             _styleSliderThumb = new GUIStyle(GUI.skin.horizontalSliderThumb);
@@ -197,7 +206,7 @@ namespace VED.Utilities
             GUILayout.BeginHorizontal();
             GUILayout.Label(name, Instance._styleLabel);
             GUILayout.BeginVertical();
-            string newValue = GUILayout.TextField(one.ToString(), Instance._styleText, Instance._options);
+            string newValue = GUILayout.TextField(one.ToString(), Instance._styleTextHalf, Instance._options);
             if (newValue.Length == 0) newValue = "0";
 
             if (int.TryParse(newValue, out int newIntValue))
@@ -210,7 +219,7 @@ namespace VED.Utilities
             }
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
-            newValue = GUILayout.TextField(two.ToString(), Instance._styleText, Instance._options);
+            newValue = GUILayout.TextField(two.ToString(), Instance._styleTextHalf, Instance._options);
             if (newValue.Length == 0) newValue = "0";
 
             if (int.TryParse(newValue, out newIntValue))
@@ -289,7 +298,7 @@ namespace VED.Utilities
             GUILayout.BeginHorizontal();
             GUILayout.Label(name, Instance._styleLabel);
             GUILayout.BeginVertical();
-            string newValue = GUILayout.TextField(one.ToString(), Instance._styleText, Instance._options);
+            string newValue = GUILayout.TextField(one.ToString(), Instance._styleTextHalf, Instance._options);
             if (newValue.Length == 0) newValue = "0";
 
             if (float.TryParse(newValue, out float newFloatValue))
@@ -302,7 +311,7 @@ namespace VED.Utilities
             }
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
-            newValue = GUILayout.TextField(two.ToString(), Instance._styleText, Instance._options);
+            newValue = GUILayout.TextField(two.ToString(), Instance._styleTextHalf, Instance._options);
             if (newValue.Length == 0) newValue = "0";
 
             if (float.TryParse(newValue, out newFloatValue))
@@ -385,7 +394,7 @@ namespace VED.Utilities
 
             GUIStyle styleColour = new GUIStyle(GUI.skin.box);
             styleColour.normal.background = Instance.CreateTexture(1, 1, value);
-            GUILayout.Box(string.Empty, styleColour, new GUILayoutOption[] { GUILayout.Width(Screen.width * 0.5f), GUILayout.Height(Screen.height * 0.055f) });
+            GUILayout.Box(string.Empty, styleColour, new GUILayoutOption[] { GUILayout.Width(Screen.width * WIDTH), GUILayout.Height(Screen.height * 0.075f) });
 
             float r = GUILayout.HorizontalSlider(value.r, 0f, 1f, Instance._styleSlider, Instance._styleSliderThumb);
             float g = GUILayout.HorizontalSlider(value.g, 0f, 1f, Instance._styleSlider, Instance._styleSliderThumb);
@@ -400,6 +409,64 @@ namespace VED.Utilities
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
+            MarginField();
+
+            return value;
+        }
+
+
+        public static T EnumField<T>(string name, T value) where T : Enum
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(name, Instance._styleLabel);
+            GUILayout.BeginVertical();
+
+            GUILayout.TextField(value.ToString(), Instance._styleText, Instance._options);
+
+            List<T> values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+            string[] names = Enum.GetNames(typeof(T));
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (GUILayout.Button(names[i], Instance._styleButton, Instance._options))
+                {
+                    value = values[i];
+                }
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+
+            MarginField();
+
+            return value;
+        }
+
+        public static T EnumButtonField<T>(string name, T value, Action<T> onPress = null) where T : Enum
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(name, Instance._styleButton, Instance._options))
+            {
+                onPress?.Invoke(value);
+            }
+            GUILayout.BeginVertical();
+
+            GUILayout.TextField(value.ToString(), Instance._styleText, Instance._options);
+
+            List<T> values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+            string[] names = Enum.GetNames(typeof(T));
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (GUILayout.Button(names[i], Instance._styleButton, Instance._options))
+                {
+                    value = values[i];
+                }
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+
             MarginField();
 
             return value;
