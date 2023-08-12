@@ -2,7 +2,8 @@
     "name": "com.veryevildemons.veryevilutilities",
     "rootNamespace": "VED",
     "references": [
-        "GUID:552447fb6cdb3d34b969d73c1b33b7d8"
+        "GUID:552447fb6cdb3d34b969d73c1b33b7d8",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

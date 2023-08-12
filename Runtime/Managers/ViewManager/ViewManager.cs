@@ -2,6 +2,7 @@ using Nova;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace VED.Utilities
 {
@@ -55,6 +56,19 @@ namespace VED.Utilities
             _screenSpace = _uiBlock2D.gameObject.AddComponent<ScreenSpace>();
             _screenSpace.TargetCamera = _camera;
             _screenSpace.Mode = ScreenSpace.FillMode.MatchCameraResolution;
+
+            UniversalAdditionalCameraData cameraData = _camera.GetUniversalAdditionalCameraData();
+            cameraData.renderType = CameraRenderType.Overlay;
+
+            Camera cameraMain = Camera.main;
+            if (cameraMain == null )
+            {
+                Debug.Log("Ensure there exists a camera tagged 'MainCamera' at time of initializing ViewManager");
+                return;
+            }
+
+            UniversalAdditionalCameraData cameraDataMain = cameraMain.GetUniversalAdditionalCameraData();
+            cameraDataMain.cameraStack.Add(_camera);
         }
 
         private void InitViewMapper(ViewMapper viewMapper)
