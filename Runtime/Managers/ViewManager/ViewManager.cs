@@ -59,6 +59,7 @@ namespace VED.Utilities
 
             UniversalAdditionalCameraData cameraData = _camera.GetUniversalAdditionalCameraData();
             cameraData.renderType = CameraRenderType.Overlay;
+            cameraData.renderPostProcessing = true;
 
             Camera cameraMain = Camera.main;
             if (cameraMain == null )
