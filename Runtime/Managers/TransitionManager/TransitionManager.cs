@@ -21,8 +21,8 @@ namespace VED.Utilities
         }
         private TransitionMapper _transitionMapper = null;
 
-        private const float DEFAULT_DURATION = 0.5f;
-        private const float DEFAULT_TIMEOUT = 200f;
+        private const float DEFAULT_DURATION = 000.000f;
+        private const float DEFAULT_TIMEOUT  = 200.000f;
 
         private TimerRealtime _timer = new TimerRealtime(DEFAULT_DURATION);
         private AwaiterRealtime _awaiter = new AwaiterRealtime(DEFAULT_TIMEOUT);
@@ -58,7 +58,7 @@ namespace VED.Utilities
             }
         }
 
-        public void TransitionOut<T>(Action callback = null, float duration = DEFAULT_DURATION) where T : Transition
+        public void TransitionOut<T>(Action callback = null) where T : Transition
         {
             Stop();
 
@@ -70,10 +70,10 @@ namespace VED.Utilities
                 return;
             }
 
-            transition.Out(callback, duration);
+            transition.Out(callback);
         }
 
-        public void TransitionIn<T>(Action callback = null, float duration = DEFAULT_DURATION)
+        public void TransitionIn<T>(Action callback = null)
             where T : Transition
         {
             Stop();
@@ -86,42 +86,42 @@ namespace VED.Utilities
                 return;
             }
 
-            transition.In(callback, duration);
+            transition.In(callback);
         }
 
-        public void Transition<T, U>(Action outCallback = null, Action midCallback = null, Action inCallback = null, float outDuration = DEFAULT_DURATION, float midDuration = 0f, float inDuration = DEFAULT_DURATION)
+        public void Transition<T, U>(Action outCallback = null, Action midCallback = null, Action inCallback = null, float midDuration = 0f)
             where T : Transition
             where U : Transition
         {
             void OutCallback()
             {
-                void MidCallback() => TransitionIn<U>(inCallback, inDuration);
+                void MidCallback() => TransitionIn<U>(inCallback);
 
                 midCallback += MidCallback;
                 _timer.Set(callback: midCallback, duration: midDuration);
             }
 
             outCallback += OutCallback;
-            TransitionOut<T>(outCallback, outDuration);
+            TransitionOut<T>(outCallback);
         }
 
-        public void Transition<T, U>(Func<bool> inCondition, Action outCallback = null, Action midCallback = null, Action inCallback = null, float outDuration = DEFAULT_DURATION, float inDuration = DEFAULT_DURATION)
+        public void Transition<T, U>(Func<bool> inCondition, Action outCallback = null, Action midCallback = null, Action inCallback = null)
             where T : Transition
             where U : Transition
         {
             void OutCallback()
             {
-                void MidCallback() => TransitionIn<U>(inCallback, inDuration);
+                void MidCallback() => TransitionIn<U>(inCallback);
 
                 midCallback += MidCallback;
                 _awaiter.Set(inCondition, midCallback);
             }
 
             outCallback += OutCallback;
-            TransitionOut<T>(outCallback, outDuration);
+            TransitionOut<T>(outCallback);
         }
 
-        public void TransitionScene<T, U>(string scene, Action outCallback = null, Action midCallback = null, Action inCallback = null, float outDuration = DEFAULT_DURATION, float midDuration = 0f, float inDuration = DEFAULT_DURATION)
+        public void TransitionScene<T, U>(string scene, Action outCallback = null, Action midCallback = null, Action inCallback = null, float midDuration = 0f)
             where T : Transition
             where U : Transition
         {
@@ -136,7 +136,7 @@ namespace VED.Utilities
                 {
                     void SceneLoadedCallback(Scene scene, LoadSceneMode mode)
                     {
-                        TransitionIn<U>(inCallback, inDuration);
+                        TransitionIn<U>(inCallback);
                     }
 
                     SceneManager.sceneLoaded += SceneLoadedCallback;
@@ -148,7 +148,7 @@ namespace VED.Utilities
             }
 
             outCallback += OutCallback;
-            TransitionOut<T>(outCallback, outDuration);
+            TransitionOut<T>(outCallback);
         }
 
         public T GetTransition<T>() where T : Transition

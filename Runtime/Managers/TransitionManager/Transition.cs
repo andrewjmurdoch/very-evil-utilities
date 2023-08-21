@@ -7,11 +7,9 @@ namespace VED.Utilities
     [RequireComponent(typeof(UIBlock2D))]
     public abstract class Transition : MonoBehaviour
     {
-        public const float DEFAULT_DURATION = 1f;
-
         public abstract void Stop();
-        public abstract void In(Action callback = null, float duration = DEFAULT_DURATION);
-        public abstract void Out(Action callback = null, float duration = DEFAULT_DURATION);
+        public abstract void In(Action callback = null);
+        public abstract void Out(Action callback = null);
 
         public UIBlock2D UIBlock2D => _uiBlock2D;
         protected UIBlock2D _uiBlock2D = null;
