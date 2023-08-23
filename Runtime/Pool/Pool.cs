@@ -20,7 +20,12 @@ namespace VED.Utilities
 
         private const int INITIAL_SIZE = 30;
 
-        public void Init(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
+        public Pool(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
+        {
+            Init(original, parent, size, init, deinit);
+        }
+
+        public Pool<T> Init(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
         {
             _original = original;
 
@@ -33,6 +38,8 @@ namespace VED.Utilities
             _deinit = deinit;
 
             Extend(size);
+
+            return this;
         }
 
         public void Deinit()
