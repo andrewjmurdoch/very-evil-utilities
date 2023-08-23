@@ -20,24 +20,7 @@ namespace VED.Utilities
 
         private const int INITIAL_SIZE = 30;
 
-        public Pool() { }
-
-        public Pool(T original, Transform parent, int size = INITIAL_SIZE)
-        {
-            _original = original;
-
-            // create transform to hold pooled objects
-            _transform = new GameObject(typeof(T).ToString() + " Pool").transform;
-            _transform.SetParent(parent);
-            _transform.gameObject.SetActive(false);
-
-            _init = null;
-            _deinit = null;
-
-            Extend(size);
-        }
-
-        public void Init(T original, Transform parent, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
+        public void Init(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
         {
             _original = original;
 
@@ -99,14 +82,14 @@ namespace VED.Utilities
             instance.transform.SetParent(_transform);
         }
 
-        public void Extend(int size = 0)
+        public void Extend(int size)
         {
-            size = Mathf.Max(0, size);
             for (int i = 0; i < size; i++)
             {
                 T instance = UnityEngine.Object.Instantiate(_original);
                 _init?.Invoke(instance);
-                Push(instance);
+                _inactive.Push(instance);
+                instance.transform.SetParent(_transform);
             }
         }
     }
