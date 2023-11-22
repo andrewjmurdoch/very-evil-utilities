@@ -9,12 +9,6 @@ namespace VED.Utilities
         [SerializeField] public bool Enabled;
         [SerializeField] public T Value;
 
-        public Optional(T value, bool enabled = false)
-        {
-            Enabled = enabled;
-            Value = value;
-        }
-
         public Optional(bool enabled, T value)
         {
             Enabled = enabled;
