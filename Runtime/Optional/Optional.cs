@@ -14,5 +14,11 @@ namespace VED.Utilities
             Enabled = enabled;
             Value = value;
         }
+
+        public Optional(bool enabled, T value)
+        {
+            Enabled = enabled;
+            Value = value;
+        }
     }
 }
