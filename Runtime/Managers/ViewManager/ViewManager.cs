@@ -33,6 +33,9 @@ namespace VED.Utilities
         public Camera Camera => _camera;
         private Camera _camera = null;
 
+        public Camera CameraTransition => _cameraTransition;
+        private Camera _cameraTransition = null;
+
         private ScreenSpace _screenSpace = null;
 
         protected override void Awake()
@@ -42,11 +45,28 @@ namespace VED.Utilities
             _camera = new GameObject("View Camera").AddComponent<Camera>();
             _camera.transform.SetParent(transform);
             _camera.transform.position = new Vector3(0f, 0f, -10f);
-            _camera.backgroundColor = Color.black;
+            _camera.backgroundColor = Color.clear;
             _camera.orthographic = true;
             _camera.cullingMask = 1 << LayerMask.NameToLayer("UI");
             _camera.clearFlags = CameraClearFlags.Nothing;
             _camera.depth = 100;
+
+            UniversalAdditionalCameraData cameraData = _camera.GetUniversalAdditionalCameraData();
+            cameraData.renderType = CameraRenderType.Overlay;
+            cameraData.renderPostProcessing = true;
+
+            _cameraTransition = new GameObject("Transition Camera").AddComponent<Camera>();
+            _cameraTransition.transform.SetParent(transform);
+            _cameraTransition.transform.position = new Vector3(0f, 0f, -10f);
+            _cameraTransition.backgroundColor = Color.clear;
+            _cameraTransition.orthographic = true;
+            _cameraTransition.cullingMask = 1 << LayerMask.NameToLayer("Transition");
+            _cameraTransition.clearFlags = CameraClearFlags.Nothing;
+            _cameraTransition.depth = 100;
+
+            UniversalAdditionalCameraData cameraTransitionData = _cameraTransition.GetUniversalAdditionalCameraData();
+            cameraTransitionData.renderType = CameraRenderType.Overlay;
+            cameraTransitionData.renderPostProcessing = true;
 
             _uiBlock2D = new GameObject("View UIBlock2D").AddComponent<UIBlock2D>();
             _uiBlock2D.transform.SetParent(transform);
@@ -56,10 +76,7 @@ namespace VED.Utilities
             _screenSpace = _uiBlock2D.gameObject.AddComponent<ScreenSpace>();
             _screenSpace.TargetCamera = _camera;
             _screenSpace.Mode = ScreenSpace.FillMode.MatchCameraResolution;
-
-            UniversalAdditionalCameraData cameraData = _camera.GetUniversalAdditionalCameraData();
-            cameraData.renderType = CameraRenderType.Overlay;
-            cameraData.renderPostProcessing = true;
+            _screenSpace.AddAdditionalCamera(_cameraTransition);
 
             Camera cameraMain = Camera.main;
             if (cameraMain == null )
@@ -70,6 +87,7 @@ namespace VED.Utilities
 
             UniversalAdditionalCameraData cameraDataMain = cameraMain.GetUniversalAdditionalCameraData();
             cameraDataMain.cameraStack.Add(_camera);
+            cameraDataMain.cameraStack.Add(_cameraTransition);
         }
 
         private void InitViewMapper(ViewMapper viewMapper)

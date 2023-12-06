@@ -16,7 +16,7 @@ namespace VED.Utilities
 
         protected virtual void Awake()
         {
-            int layer = LayerMask.NameToLayer("UI");
+            int layer = LayerMask.NameToLayer("Transition");
 
             _uiBlock2D = GetComponent<UIBlock2D>();
             _uiBlock2D.GameObjectLayer = layer;
