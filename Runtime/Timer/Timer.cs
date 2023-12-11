@@ -6,7 +6,7 @@ namespace VED.Utilities
     [Serializable]
     public class Timer
     {
-        public virtual float Time => _time;
+        public virtual float Time { get { return _time; } set { _time = Mathf.Clamp(value, 0f, Duration); } }
         [SerializeField, ReadOnly] protected float _time = 0f;
 
         public float Duration { get { return _duration; } set { _duration = value; _defaultDuration = value; } }
