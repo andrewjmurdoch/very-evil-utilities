@@ -33,9 +33,6 @@ namespace VED.Utilities
         public Camera Camera => _camera;
         private Camera _camera = null;
 
-        public Camera CameraTransition => _cameraTransition;
-        private Camera _cameraTransition = null;
-
         private ScreenSpace _screenSpace = null;
 
         protected override void Awake()
@@ -55,19 +52,6 @@ namespace VED.Utilities
             cameraData.renderType = CameraRenderType.Overlay;
             cameraData.renderPostProcessing = true;
 
-            _cameraTransition = new GameObject("Transition Camera").AddComponent<Camera>();
-            _cameraTransition.transform.SetParent(transform);
-            _cameraTransition.transform.position = new Vector3(0f, 0f, -10f);
-            _cameraTransition.backgroundColor = Color.clear;
-            _cameraTransition.orthographic = true;
-            _cameraTransition.cullingMask = 1 << LayerMask.NameToLayer("Transition");
-            _cameraTransition.clearFlags = CameraClearFlags.Nothing;
-            _cameraTransition.depth = 100;
-
-            UniversalAdditionalCameraData cameraTransitionData = _cameraTransition.GetUniversalAdditionalCameraData();
-            cameraTransitionData.renderType = CameraRenderType.Overlay;
-            cameraTransitionData.renderPostProcessing = true;
-
             _uiBlock2D = new GameObject("View UIBlock2D").AddComponent<UIBlock2D>();
             _uiBlock2D.transform.SetParent(transform);
             _uiBlock2D.BodyEnabled = false;
@@ -76,7 +60,6 @@ namespace VED.Utilities
             _screenSpace = _uiBlock2D.gameObject.AddComponent<ScreenSpace>();
             _screenSpace.TargetCamera = _camera;
             _screenSpace.Mode = ScreenSpace.FillMode.MatchCameraResolution;
-            _screenSpace.AddAdditionalCamera(_cameraTransition);
 
             Camera cameraMain = Camera.main;
             if (cameraMain == null )
@@ -87,7 +70,6 @@ namespace VED.Utilities
 
             UniversalAdditionalCameraData cameraDataMain = cameraMain.GetUniversalAdditionalCameraData();
             cameraDataMain.cameraStack.Add(_camera);
-            cameraDataMain.cameraStack.Add(_cameraTransition);
         }
 
         private void InitViewMapper(ViewMapper viewMapper)
@@ -109,11 +91,45 @@ namespace VED.Utilities
                 uiBlock2D.ZIndex = (short)count;
                 uiBlock2D.BodyEnabled = false;
                 uiBlock2D.Size.Percent = new Vector3(1f, 1f, 1f);
-                uiBlock2D.GameObjectLayer = LayerMask.NameToLayer("UI");
+                uiBlock2D.GameObjectLayer = LayerMask.NameToLayer(viewLayer.SeparateCamera ? viewLayer.ID : "UI");
                 uiBlock2D.gameObject.AddComponent<SortGroup>().SortingOrder = count;
 
                 _viewLayers.Add(viewLayer.ID, uiBlock2D);
+
+                if (!viewLayer.SeparateCamera) continue;
+                InitViewLayerCamera(viewLayer);
             }
+        }
+
+        private void InitViewLayerCamera(ViewLayer viewLayer)
+        {
+            Camera camera = new GameObject(viewLayer.ID + " Camera").AddComponent<Camera>();
+            camera.transform.SetParent(transform);
+            camera.transform.position = new Vector3(0f, 0f, -10f);
+            camera.backgroundColor = Color.clear;
+            camera.orthographic = true;
+            camera.cullingMask = 1 << LayerMask.NameToLayer(viewLayer.ID);
+            camera.clearFlags = CameraClearFlags.Nothing;
+            camera.depth = 100;
+
+            UniversalAdditionalCameraData cameraTransitionData = camera.GetUniversalAdditionalCameraData();
+            cameraTransitionData.renderType = CameraRenderType.Overlay;
+            cameraTransitionData.renderPostProcessing = true;
+
+            _screenSpace.AddAdditionalCamera(camera);
+
+            Camera cameraMain = Camera.main;
+            if (cameraMain == null)
+            {
+                Debug.Log("Ensure there exists a camera tagged 'MainCamera' at time of initializing ViewMapper");
+                return;
+            }
+
+            UniversalAdditionalCameraData cameraDataMain = cameraMain.GetUniversalAdditionalCameraData();
+            cameraDataMain.cameraStack.Add(camera);
+
+            _camera.transform.SetAsFirstSibling();
+            _uiBlock2D.transform.SetAsLastSibling();
         }
 
         private void DeinitViewMapper()

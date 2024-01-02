@@ -11,7 +11,7 @@ namespace VED.Utilities
 
         public virtual void Init()
         {
-            int layer = LayerMask.NameToLayer("UI");
+            int layer = transform.parent.gameObject.layer;
 
             _uiBlock2D = GetComponent<UIBlock2D>();
             _uiBlock2D.GameObjectLayer = layer;
