@@ -68,6 +68,7 @@ namespace VED.Utilities
         public int Range => Maximum - Minimum;
 
         public float Normalised => Mathf.Clamp01((float)(_value - _minimum) / (float)Range);
+        public float Normalise(int value) => Mathf.Clamp01((float)(value - _minimum) / (float)Range);
 
         private int Clamp(int count) => Math.Min(Math.Max(count, _minimum), _maximum);
 
