@@ -72,6 +72,25 @@ namespace VED.Utilities
             cameraDataMain.cameraStack.Add(_camera);
         }
 
+        public void InitCamera(Camera camera)
+        {
+            if (_camera != null)
+            {
+                Camera cameraMain = Camera.main;
+                if (cameraMain == null)
+                {
+                    Debug.Log("Ensure there exists a camera tagged 'MainCamera' at time of initializing ViewManager");
+                    return;
+                }
+                UniversalAdditionalCameraData cameraDataMain = cameraMain.GetUniversalAdditionalCameraData();
+                cameraDataMain.cameraStack.Remove(_camera);
+                Destroy(_camera.gameObject);
+            }
+
+            _camera = camera;
+            _screenSpace.TargetCamera = camera;
+        }
+
         private void InitViewMapper(ViewMapper viewMapper)
         {
             _viewMapper = viewMapper;
