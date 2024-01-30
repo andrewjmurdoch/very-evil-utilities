@@ -15,17 +15,17 @@ namespace VED.Utilities
         public List<T> Active => _active;
         private List<T> _active = new List<T>();
 
-        private Action<T> _init   = null;
-        private Action<T> _deinit = null;
+        public Action<T> Initialize = null;
+        public Action<T> Deinitialize = null;
 
         private const int INITIAL_SIZE = 30;
 
-        public Pool(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
+        public Pool(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> initialize = null, Action<T> deinitialize = null)
         {
-            Init(original, parent, size, init, deinit);
+            Init(original, parent, size, initialize, deinitialize);
         }
 
-        public Pool<T> Init(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> init = null, Action<T> deinit = null)
+        public Pool<T> Init(T original, Transform parent = null, int size = INITIAL_SIZE, Action<T> initialize = null, Action<T> deinitialize = null)
         {
             _original = original;
 
@@ -34,8 +34,8 @@ namespace VED.Utilities
             _transform.SetParent(parent);
             _transform.gameObject.SetActive(false);
 
-            _init = init;
-            _deinit = deinit;
+            Initialize = initialize;
+            Deinitialize = deinitialize;
 
             Extend(size);
 
@@ -48,7 +48,7 @@ namespace VED.Utilities
             for (int i = 0; i < count; i++)
             {
                 T instance = _inactive.Pop();
-                _deinit?.Invoke(instance);
+                Deinitialize?.Invoke(instance);
                 UnityEngine.Object.Destroy(instance);
             }
 
@@ -64,7 +64,7 @@ namespace VED.Utilities
             if (_inactive.Count <= 0)
             {
                 instance = UnityEngine.Object.Instantiate(_original);
-                _init?.Invoke(instance);
+                Initialize?.Invoke(instance);
                 _active.Add(instance);
                 return instance;
             }
@@ -94,7 +94,7 @@ namespace VED.Utilities
             for (int i = 0; i < size; i++)
             {
                 T instance = UnityEngine.Object.Instantiate(_original);
-                _init?.Invoke(instance);
+                Initialize?.Invoke(instance);
                 _inactive.Push(instance);
                 instance.transform.SetParent(_transform);
             }
