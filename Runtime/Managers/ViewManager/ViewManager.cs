@@ -180,6 +180,8 @@ namespace VED.Utilities
 
             Type type = typeof(T);
 
+            if (_views.ContainsKey(type)) return (T)_views[type];
+
             ViewMapper.ViewData viewData = _viewMapper[type];
             if (viewData == null)
             {

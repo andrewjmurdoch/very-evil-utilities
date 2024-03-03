@@ -164,6 +164,8 @@ namespace VED.Utilities
         {
             Type type = typeof(T);
 
+            if (_transitions.ContainsKey(type)) return (T)_transitions[type];
+
             Transition original = _transitionMapper[type];
             if (original == null)
             {
