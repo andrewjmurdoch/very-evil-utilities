@@ -3,7 +3,20 @@ namespace VED.Utilities
     public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         public StateManager StateManager => _stateManager;
-        private StateManager _stateManager = new StateManager();
+        private StateManager _stateManager = null;
+
+        protected override void Awake()
+        {
+            Init();
+        }
+
+        public void Init()
+        {
+            if (_stateManager != null) return;
+
+            _stateManager = new StateManager();
+            TimeManager.Instance.Init();
+        }
 
         private void Update()
         {

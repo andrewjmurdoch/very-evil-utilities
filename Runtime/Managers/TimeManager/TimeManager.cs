@@ -6,17 +6,7 @@ namespace VED.Utilities
     {
         public TimeManager() : base()
         {
-            _defaultTimeState = new TimeState();
-            _realTimeState = new TimeState();
-
-            _timeStates = new List<TimeState> { _defaultTimeState };
-            for (int i = 0; i < GameManager.Instance.StateManager.Stack.Count; i++)
-            {
-                _timeStates.Add(new TimeState());
-            }
-
-            GameManager.Instance.StateManager.OnPush += OnPush;
-            GameManager.Instance.StateManager.OnPop += OnPop;
+            GameManager.Instance.Init();
         }
 
         public IReadOnlyList<TimeState> TimeStates => _timeStates;
@@ -55,6 +45,21 @@ namespace VED.Utilities
 
             public List<Stopwatch> Stopwatches = new List<Stopwatch>();
             public List<TimeStateAction<Stopwatch>> TimeStateActionsStopwatch = new List<TimeStateAction<Stopwatch>>();
+        }
+
+        public void Init()
+        {
+            _defaultTimeState = new TimeState();
+            _realTimeState = new TimeState();
+
+            _timeStates = new List<TimeState> { _defaultTimeState };
+            for (int i = 0; i < GameManager.Instance.StateManager.Stack.Count; i++)
+            {
+                _timeStates.Add(new TimeState());
+            }
+
+            GameManager.Instance.StateManager.OnPush += OnPush;
+            GameManager.Instance.StateManager.OnPop  += OnPop;
         }
 
         private void OnPush(State state)
