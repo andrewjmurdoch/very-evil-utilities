@@ -6,7 +6,11 @@ namespace VED.Utilities
     [Serializable]
     public class Stopwatch
     {
-        public virtual float Time => _time;
+        public virtual float Time
+        {
+            get => _time;
+            set => _time = value;
+        }
         [SerializeField, ReadOnly] protected float _time = 0f;
 
         public bool Running => _running;

@@ -6,22 +6,45 @@ namespace VED.Utilities
     [Serializable]
     public class Timer
     {
-        public virtual float Time { get { return _time; } set { _time = Mathf.Clamp(value, 0f, Duration); } }
+        public virtual float Time
+        { 
+            get { return _time; } 
+            set { _time = Mathf.Clamp(value, 0f, Duration); }
+        }
         [SerializeField, ReadOnly] protected float _time = 0f;
 
-        public float Duration { get { return _duration; } set { _duration = value; _defaultDuration = value; } }
+        public float Duration
+        {
+            get { return _duration; }
+            set
+            { 
+                _duration = value; 
+                _defaultDuration = value; 
+            }
+        }
         [SerializeField, ReadOnly] protected float _duration = 0;
         protected float _defaultDuration = 0;
 
-        public virtual float Elapsed => Duration > 0f ? Mathf.Clamp01(Time / Duration) : 1f;
+        public virtual float Elapsed
+        {
+            get { return Duration > 0f ? Mathf.Clamp01(Time / Duration) : 1f; }
+        }
         [SerializeField, ReadOnly] protected float _elapsed = 1f;
 
-        public bool Complete => Elapsed >= 1f;
+        public bool Complete
+        {
+            get { return Elapsed >= 1f; }
+        }
         [SerializeField, ReadOnly] protected bool _complete = true;
 
-        public virtual float InverseElapsed => 1f - Elapsed;
-
-        public float InverseTime => InverseElapsed * Duration;
+        public virtual float InverseElapsed
+        {
+            get { return 1f - Elapsed; }
+        }
+        public float InverseTime
+        {
+            get { return InverseElapsed * Duration; }
+        }
 
         protected Action _tick = null;
         protected Action _callback = null;
