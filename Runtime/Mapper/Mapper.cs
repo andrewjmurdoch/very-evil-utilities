@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VED.Utilities;
 
-namespace VED
+namespace VED.Utilities
 {
     [Serializable]
     public class Mapper<T, U>
