@@ -43,55 +43,55 @@ namespace VED.Utilities
         private static string FormatSeconds(Format format, decimal time, string spacer = ".")
         {
             decimal seconds = Math.Floor(time / SEC);
-            decimal milliseconds = Modulus(time, seconds * SEC) / MIL;
+            decimal milliseconds = Math.Floor(Modulus(time, seconds * SEC) / MIL);
     
             switch (format)
             {
                 case Format.SS    : return seconds.ToString("00");
-                case Format.SSMMM : return seconds.ToString("00") + spacer + milliseconds.ToString("00");
+                case Format.SSMMM : return seconds.ToString("00") + spacer + milliseconds.ToString("000");
                 default: return seconds.ToString("00");
             }
         }
     
         private static string FormatMinutes(Format format, decimal time, string spacer = ".")
         {
-            decimal minutes = Math.Floor(time / MIN);
-            decimal seconds = Math.Floor(Modulus(time, minutes * MIN) / SEC);
-            decimal milliseconds = Modulus(Modulus(time, minutes * MIN), seconds * SEC) / MIL;
+            decimal minutes      = Math.Floor(time / MIN);
+            decimal seconds      = Math.Floor(Modulus(time, minutes * MIN) / SEC);
+            decimal milliseconds = Math.Floor(Modulus(Modulus(time, minutes * MIN), seconds * SEC) / MIL);
     
             switch (format)
             {
                 case Format.MM      : return minutes.ToString("00");
                 case Format.MMSS    : return minutes.ToString("00") + spacer + seconds.ToString("00");
-                case Format.MMSSMMM : return minutes.ToString("00") + spacer + seconds.ToString("00") + spacer + milliseconds.ToString("00");
+                case Format.MMSSMMM : return minutes.ToString("00") + spacer + seconds.ToString("00") + spacer + milliseconds.ToString("000");
                 default: return minutes.ToString("00");
             }
         }
     
         private static string FormatHours(Format format, decimal time, string spacer = ".")
         {
-            decimal hours = Math.Floor(time / HOU);
-            decimal minutes = Math.Floor(Modulus(time, hours * HOU) / MIN);
-            decimal seconds = Math.Floor(Modulus(Modulus(time, hours * HOU), minutes * MIN) / SEC);
-            decimal milliseconds = Modulus(Modulus(Modulus(time, hours * HOU), minutes * MIN), seconds * SEC) / MIL;
+            decimal hours        = Math.Floor(time / HOU);
+            decimal minutes      = Math.Floor(Modulus(time, hours * HOU) / MIN);
+            decimal seconds      = Math.Floor(Modulus(Modulus(time, hours * HOU), minutes * MIN) / SEC);
+            decimal milliseconds = Math.Floor(Modulus(Modulus(Modulus(time, hours * HOU), minutes * MIN), seconds * SEC) / MIL);
     
             switch (format)
             {
                 case Format.HH        : return hours.ToString("00");
                 case Format.HHMM      : return hours.ToString("00") + spacer + minutes.ToString("00");
                 case Format.HHMMSS    : return hours.ToString("00") + spacer + minutes.ToString("00") + spacer + seconds.ToString("00");
-                case Format.HHMMSSMMM : return hours.ToString("00") + spacer + minutes.ToString("00") + spacer + seconds.ToString("00") + spacer + milliseconds.ToString("00");
+                case Format.HHMMSSMMM : return hours.ToString("00") + spacer + minutes.ToString("00") + spacer + seconds.ToString("00") + spacer + milliseconds.ToString("000");
                 default: return hours.ToString("00");
             }
         }
     
         private static string FormatDays(Format format, decimal time, string spacer = ".")
         {
-            decimal days = Math.Floor(time / DAY);
-            decimal hours = Math.Floor(Modulus(time, days * DAY) / HOU);
-            decimal minutes = Math.Floor(Modulus(Modulus(time, days * DAY), hours * HOU) / MIN);
-            decimal seconds = Math.Floor(Modulus(Modulus(Modulus(time, days * DAY), hours * HOU), minutes * MIN) / SEC);
-            decimal milliseconds = Modulus(Modulus(Modulus(Modulus(time, days * DAY), hours * HOU), minutes * MIN), seconds * SEC) / MIL;
+            decimal days         = Math.Floor(time / DAY);
+            decimal hours        = Math.Floor(Modulus(time, days * DAY) / HOU);
+            decimal minutes      = Math.Floor(Modulus(Modulus(time, days * DAY), hours * HOU) / MIN);
+            decimal seconds      = Math.Floor(Modulus(Modulus(Modulus(time, days * DAY), hours * HOU), minutes * MIN) / SEC);
+            decimal milliseconds = Math.Floor(Modulus(Modulus(Modulus(Modulus(time, days * DAY), hours * HOU), minutes * MIN), seconds * SEC) / MIL);
     
             switch (format)
             {
@@ -99,7 +99,7 @@ namespace VED.Utilities
                 case Format.DDHH        : return days.ToString("00") + spacer + hours.ToString("00");
                 case Format.DDHHMM      : return days.ToString("00") + spacer + hours.ToString("00") + spacer + minutes.ToString("00");
                 case Format.DDHHMMSS    : return days.ToString("00") + spacer + hours.ToString("00") + spacer + minutes.ToString("00") + spacer + seconds.ToString("00");
-                case Format.DDHHMMSSMMM : return days.ToString("00") + spacer + hours.ToString("00") + spacer + minutes.ToString("00") + spacer + seconds.ToString("00") + spacer + milliseconds.ToString("00");
+                case Format.DDHHMMSSMMM : return days.ToString("00") + spacer + hours.ToString("00") + spacer + minutes.ToString("00") + spacer + seconds.ToString("00") + spacer + milliseconds.ToString("000");
                 default: return days.ToString("00");
             }
         }
