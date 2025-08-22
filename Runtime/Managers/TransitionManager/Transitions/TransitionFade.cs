@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace VED.Utilities
 {
@@ -11,6 +12,8 @@ namespace VED.Utilities
         private const float ALPHA_MAX = 001.000f;
         private const float DURATION  = 000.500f;
 
+        [SerializeField] private RawImage _rawImage = null;
+
         [SerializeField] private Easing.Controller _easingController = new Easing.Controller(Easing.Shape.SINE, Easing.Extent.INOUT);
 
         protected override void Awake()
@@ -21,23 +24,23 @@ namespace VED.Utilities
 
         public override void Stop()
         {
-            _uiBlock2D.Color = Color.clear;
+            _rawImage.color = Color.clear;
             _timer.Reset();
         }
 
         public override void In(Action callback = null)
         {
-            _uiBlock2D.Color = Color.black;
-            void Update() => _uiBlock2D.Color = Color.black * new Color(1f, 1f, 1f, _easingController.Ease(ALPHA_MIN, ALPHA_MAX, _timer.InverseElapsed));
-            callback += () => _uiBlock2D.Color = Color.clear;
+            _rawImage.color = Color.black;
+            void Update() => _rawImage.color = Color.black * new Color(1f, 1f, 1f, _easingController.Ease(ALPHA_MIN, ALPHA_MAX, _timer.InverseElapsed));
+            callback += () => _rawImage.color = Color.clear;
             _timer.Set(Update, callback);
         }
 
         public override void Out(Action callback = null)
         {
-            _uiBlock2D.Color = Color.clear;
-            void Update() => _uiBlock2D.Color = Color.black * new Color(1f, 1f, 1f, _easingController.Ease(ALPHA_MIN, ALPHA_MAX, _timer.Elapsed));
-            callback += () => _uiBlock2D.Color = Color.black;
+            _rawImage.color = Color.clear;
+            void Update() => _rawImage.color = Color.black * new Color(1f, 1f, 1f, _easingController.Ease(ALPHA_MIN, ALPHA_MAX, _timer.Elapsed));
+            callback += () => _rawImage.color = Color.black;
             _timer.Set(Update, callback);
         }
     }

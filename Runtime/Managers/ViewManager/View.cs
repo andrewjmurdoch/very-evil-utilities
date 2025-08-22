@@ -1,25 +1,25 @@
-using Nova;
+using Gooey;
 using UnityEngine;
 
 namespace VED.Utilities
 {
-    [RequireComponent(typeof(UIBlock2D))]
+    [RequireComponent(typeof(Goo))]
     public abstract class View : MonoBehaviour
     {
-        public UIBlock2D UIBlock2D => _uiBlock2D;
-        protected UIBlock2D _uiBlock2D = null;
+        public Goo Goo => _goo;
+        protected Goo _goo = null;
 
         public virtual void Init()
         {
             int layer = transform.parent.gameObject.layer;
 
-            _uiBlock2D = GetComponent<UIBlock2D>();
-            _uiBlock2D.GameObjectLayer = layer;
+            _goo = GetComponent<Goo>();
+            gameObject.layer = layer;
 
-            UIBlock[] uiBlocks = GetComponentsInChildren<UIBlock>();
-            for (int i = 0; i < uiBlocks.Length; i++)
+            Goo[] goo = GetComponentsInChildren<Goo>();
+            for (int i = 0; i < goo.Length; i++)
             {
-                uiBlocks[i].GameObjectLayer = layer;
+                goo[i].gameObject.layer = layer;
             }
         }
 

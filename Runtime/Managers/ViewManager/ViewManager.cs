@@ -1,4 +1,4 @@
-using Nova;
+using Gooey;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,16 +24,16 @@ namespace VED.Utilities
 
         private Dictionary<Type, View> _views = new Dictionary<Type, View>();
 
-        public Dictionary<string, UIBlock2D> ViewLayers => _viewLayers;
-        private Dictionary<string, UIBlock2D> _viewLayers = new Dictionary<string, UIBlock2D>();
+        public Dictionary<string, Goo> ViewLayers => _viewLayers;
+        private Dictionary<string, Goo> _viewLayers = new Dictionary<string, Goo>();
 
-        public UIBlock2D UIBlock2D => _uiBlock2D;
-        private UIBlock2D _uiBlock2D = null;
+        public Goo Goo => _goo;
+        private Goo _goo = null;
 
         public Camera Camera => _camera;
         private Camera _camera = null;
 
-        private ScreenSpace _screenSpace = null;
+        private Canvas _canvas = null;
 
         protected override void Awake()
         {
@@ -52,14 +52,13 @@ namespace VED.Utilities
             cameraData.renderType = CameraRenderType.Overlay;
             cameraData.renderPostProcessing = true;
 
-            _uiBlock2D = new GameObject("View UIBlock2D").AddComponent<UIBlock2D>();
-            _uiBlock2D.transform.SetParent(transform);
-            _uiBlock2D.BodyEnabled = false;
-            _uiBlock2D.GameObjectLayer = LayerMask.NameToLayer("UI");
+            _goo = new GameObject("View Goo").AddComponent<Goo>();
+            _goo.RectTransform.SetParent(transform, false);
+            _goo.gameObject.layer = LayerMask.NameToLayer("UI");
 
-            _screenSpace = _uiBlock2D.gameObject.AddComponent<ScreenSpace>();
-            _screenSpace.TargetCamera = _camera;
-            _screenSpace.Mode = ScreenSpace.FillMode.MatchCameraResolution;
+            _canvas = _goo.gameObject.AddComponent<Canvas>();
+            _canvas.worldCamera = _camera;
+            _canvas.renderMode = RenderMode.ScreenSpaceCamera;
 
             Camera cameraMain = Camera.main;
             if (cameraMain == null )
@@ -88,7 +87,7 @@ namespace VED.Utilities
             }
 
             _camera = camera;
-            _screenSpace.TargetCamera = camera;
+            _canvas.worldCamera = _camera;
         }
 
         private void InitViewMapper(ViewMapper viewMapper)
@@ -102,18 +101,17 @@ namespace VED.Utilities
 
                 if (i > 0) count += _viewMapper.ViewLayers[i - 1].Views.Count + 1;
 
-                UIBlock2D uiBlock2D = new GameObject(viewLayer.ID).AddComponent<UIBlock2D>();
-                Transform uiBlock2DTransform = uiBlock2D.transform;
+                Goo goo = new GameObject(viewLayer.ID).AddComponent<Goo>();
+                RectTransform gooTransform = goo.RectTransform;
 
-                uiBlock2DTransform.SetParent(_uiBlock2D.transform);
-                uiBlock2DTransform.SetAsLastSibling();
-                uiBlock2D.ZIndex = (short)count;
-                uiBlock2D.BodyEnabled = false;
-                uiBlock2D.Size.Percent = new Vector3(1f, 1f, 1f);
-                uiBlock2D.GameObjectLayer = LayerMask.NameToLayer(viewLayer.SeparateCamera ? viewLayer.ID : "UI");
-                uiBlock2D.gameObject.AddComponent<SortGroup>().SortingOrder = count;
+                gooTransform.SetParent(_goo.RectTransform, false);
+                gooTransform.SetAsLastSibling();
 
-                _viewLayers.Add(viewLayer.ID, uiBlock2D);
+                goo.SizeHorizontalValue = new Value(Gooey.ValueType.PERCENTAGE, 100f);
+                goo.SizeVerticalValue   = new Value(Gooey.ValueType.PERCENTAGE, 100f);
+                goo.gameObject.layer    = LayerMask.NameToLayer(viewLayer.SeparateCamera ? viewLayer.ID : "UI");
+
+                _viewLayers.Add(viewLayer.ID, goo);
 
                 if (!viewLayer.SeparateCamera) continue;
                 InitViewLayerCamera(viewLayer);
@@ -123,7 +121,7 @@ namespace VED.Utilities
         private void InitViewLayerCamera(ViewLayer viewLayer)
         {
             Camera camera = new GameObject(viewLayer.ID + " Camera").AddComponent<Camera>();
-            camera.transform.SetParent(transform);
+            camera.transform.SetParent(transform, false);
             camera.transform.position = new Vector3(0f, 0f, -10f);
             camera.backgroundColor = Color.clear;
             camera.orthographic = true;
@@ -134,8 +132,6 @@ namespace VED.Utilities
             UniversalAdditionalCameraData cameraTransitionData = camera.GetUniversalAdditionalCameraData();
             cameraTransitionData.renderType = CameraRenderType.Overlay;
             cameraTransitionData.renderPostProcessing = true;
-
-            _screenSpace.AddAdditionalCamera(camera);
 
             Camera cameraMain = Camera.main;
             if (cameraMain == null)
@@ -148,15 +144,15 @@ namespace VED.Utilities
             cameraDataMain.cameraStack.Add(camera);
 
             _camera.transform.SetAsFirstSibling();
-            _uiBlock2D.transform.SetAsLastSibling();
+            _goo.RectTransform.SetAsLastSibling();
         }
 
         private void DeinitViewMapper()
         {
             // destroy all current view layers
-            for (int i = 0; i < _uiBlock2D.transform.childCount; i++)
+            for (int i = 0; i < _goo.transform.childCount; i++)
             {
-                Destroy(_uiBlock2D.transform.GetChild(0).gameObject);
+                Destroy(_goo.transform.GetChild(0).gameObject);
             }
             _viewLayers.Clear();
             _views.Clear();
@@ -232,7 +228,6 @@ namespace VED.Utilities
                 {
                     Transform viewTransform = view.transform;
                     viewTransform.SetAsLastSibling();
-                    view.UIBlock2D.ZIndex = (short)(count + i);
                 }
             }
         }

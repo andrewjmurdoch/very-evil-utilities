@@ -4,12 +4,12 @@ namespace VED.Utilities
     {
         public override void Show()
         {
-            _uiBlock2D.Visible = true;
+            gameObject.SetActive(true);
         }
 
         public override void Hide()
         {
-            _uiBlock2D.Visible = false;
+            gameObject.SetActive(false);
         }
     }
 }
