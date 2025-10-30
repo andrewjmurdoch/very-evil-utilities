@@ -2,8 +2,8 @@
     "name": "com.veryevildemons.veryevilutilities",
     "rootNamespace": "VED",
     "references": [
-        "GUID:15fc0a57446b3144c949da3e2b9737a9",
-        "GUID:3a0c6030277639c45ae3c2ce2dff7492"
+        "Unity.RenderPipelines.Universal.Runtime",
+        "com.veryevildemons.Gooey"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
