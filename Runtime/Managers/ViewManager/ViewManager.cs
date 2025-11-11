@@ -54,7 +54,7 @@ namespace VED.Utilities
                 }
             }
         }
-        public string _layer = "UI";
+        private string _layer = "UI";
 
         protected override void Awake()
         {
