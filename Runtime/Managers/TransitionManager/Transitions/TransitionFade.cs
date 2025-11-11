@@ -43,5 +43,15 @@ namespace VED.Utilities
             callback += () => _rawImage.color = Color.black;
             _timer.Set(Update, callback);
         }
+
+        public override void SetIn()
+        {
+            _rawImage.color = Color.clear;
+        }
+
+        public override void SetOut()
+        {
+            _rawImage.color = Color.black;
+        }
     }
 }

@@ -10,6 +10,8 @@ namespace VED.Utilities
         public abstract void Stop();
         public abstract void In(Action callback = null);
         public abstract void Out(Action callback = null);
+        public abstract void SetIn();
+        public abstract void SetOut();
 
         public Goo Goo => _goo;
         protected Goo _goo = null;

@@ -89,6 +89,30 @@ namespace VED.Utilities
             transition.In(callback);
         }
 
+        public void SetOut<T>() where T : Transition
+        {
+            Stop();
+
+            T transition = GetTransition<T>();
+
+            if (transition == null)
+                return;
+
+            transition.SetOut();
+        }
+
+        public void SetIn<T>() where T : Transition
+        {
+            Stop();
+
+            T transition = GetTransition<T>();
+
+            if (transition == null)
+                return;
+
+            transition.SetIn();
+        }
+
         public void Transition<T, U>(Action outCallback = null, Action midCallback = null, Action inCallback = null, float midDuration = 0f)
             where T : Transition
             where U : Transition
