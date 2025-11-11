@@ -1,6 +1,7 @@
 using Gooey;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -35,6 +36,26 @@ namespace VED.Utilities
 
         private Canvas _canvas = null;
 
+        public string Layer
+        {
+            get => _layer;
+
+            set
+            {
+                _layer = value;
+
+                _camera.cullingMask = 1 << LayerMask.NameToLayer(_layer);
+                _goo.gameObject.layer = LayerMask.NameToLayer(_layer);
+
+                View[] views = _views.Values.ToArray();
+                for (int i = 0; i < views.Length; i++)
+                {
+                    views[i].gameObject.layer = LayerMask.NameToLayer(_layer);
+                }
+            }
+        }
+        public string _layer = "UI";
+
         protected override void Awake()
         {
             base.Awake();
@@ -44,7 +65,7 @@ namespace VED.Utilities
             _camera.transform.position = new Vector3(0f, 0f, -10f);
             _camera.backgroundColor = Color.clear;
             _camera.orthographic = true;
-            _camera.cullingMask = 1 << LayerMask.NameToLayer("UI");
+            _camera.cullingMask = 1 << LayerMask.NameToLayer(_layer);
             _camera.clearFlags = CameraClearFlags.Nothing;
             _camera.depth = 100;
 
@@ -54,7 +75,7 @@ namespace VED.Utilities
 
             _goo = new GameObject("View Goo").AddComponent<Goo>();
             _goo.RectTransform.SetParent(transform, false);
-            _goo.gameObject.layer = LayerMask.NameToLayer("UI");
+            _goo.gameObject.layer = LayerMask.NameToLayer(_layer);
 
             _canvas = _goo.gameObject.AddComponent<Canvas>();
             _canvas.worldCamera = _camera;
@@ -109,7 +130,7 @@ namespace VED.Utilities
 
                 goo.SizeHorizontalValue = new Value(Gooey.ValueType.PERCENTAGE, 100f);
                 goo.SizeVerticalValue   = new Value(Gooey.ValueType.PERCENTAGE, 100f);
-                goo.gameObject.layer    = LayerMask.NameToLayer(viewLayer.SeparateCamera ? viewLayer.ID : "UI");
+                goo.gameObject.layer    = LayerMask.NameToLayer(viewLayer.SeparateCamera ? viewLayer.ID : _layer);
 
                 _viewLayers.Add(viewLayer.ID, goo);
 

@@ -13,7 +13,7 @@ namespace VED.Utilities
             {
                 if (_instance != null) return _instance;
                 
-                T inScene = FindObjectOfType<T>();
+                T inScene = FindAnyObjectByType<T>();
                 if (inScene != null)
                 {
                     _instance = inScene;
