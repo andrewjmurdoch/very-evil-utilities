@@ -18,5 +18,10 @@ namespace VED.Utilities
         {
             return b + (a - b) * Mathf.Exp(-decayConstant * deltaTime);
         }
+
+        public static Color Lerp(Color a, Color b, float deltaTime, float decayConstant)
+        {
+            return b + (a - b) * Mathf.Exp(-decayConstant * deltaTime);
+        }
     }
 }
