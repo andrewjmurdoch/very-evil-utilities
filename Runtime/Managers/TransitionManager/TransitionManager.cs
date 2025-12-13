@@ -35,9 +35,9 @@ namespace VED.Utilities
         {
             base.Awake();
 
-            TransitionView transitionView = ViewManager.Instance.GetView<TransitionView>();
-            transitionView.Show();
-            _root = transitionView.transform;
+            ViewTransition viewTransition = ViewManager.Instance.GetView<ViewTransition>();
+            viewTransition.Show();
+            _root = viewTransition.transform;
         }
 
         private void DeinitTransitionMapper()

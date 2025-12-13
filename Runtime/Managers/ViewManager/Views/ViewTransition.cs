@@ -1,6 +1,6 @@
 namespace VED.Utilities
 {
-    public class TransitionView : View
+    public class ViewTransition : View
     {
         public override void Show()
         {
