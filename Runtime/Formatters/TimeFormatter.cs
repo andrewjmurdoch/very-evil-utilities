@@ -11,29 +11,31 @@ namespace VED.Utilities
         const decimal DAY = HOU * 24;
     
         public enum Format
-    {
-        MMM,
-        SS,
-        SSMMM,
-        MM,
-        MMSS,
-        MMSSMMM,
-        HH,
-        HHMM,
-        HHMMSS,
-        HHMMSSMMM,
-        DD,
-        DDHH,
-        DDHHMM,
-        DDHHMMSS,
-        DDHHMMSSMMM,
-    }
+        {
+            MMM,
+            SS,
+            SSMMM,
+            MM,
+            MMSS,
+            MMSSMMM,
+            HH,
+            HHMM,
+            HHMMSS,
+            HHMMSSMMM,
+            DD,
+            DDHH,
+            DDHHMM,
+            DDHHMMSS,
+            DDHHMMSSMMM,
+        }
     
         private static decimal Modulus(decimal u, decimal d)
-    {
-        if (d == 0) return u;
-        return u % d;
-    }
+        {
+            if (d == 0)
+                return u;
+
+            return u % d;
+        }
     
         private static string FormatMilliseconds(decimal time)
         {
@@ -104,9 +106,8 @@ namespace VED.Utilities
             }
         }
 
-
-        public static string FormatTime(Format format, float seconds, string spacer = ".") => FormatTime(format, (decimal)seconds, spacer);
-
+        public static string FormatTime(Format format, float   seconds, string spacer = ".") => FormatTime(format, (decimal)seconds, spacer);
+        public static string FormatTime(Format format, double  seconds, string spacer = ".") => FormatTime(format, (decimal)seconds, spacer);
         public static string FormatTime(Format format, decimal seconds, string spacer = ".")
         {
             switch (format)
