@@ -10,10 +10,10 @@ namespace VED.Utilities
         [SerializeField, ReadOnly] protected float _time = 0f;
 
         public float Timeout { get { return _timeout; } set { _timeout = value; _defaultTimeout = value; } }
-        [SerializeField, ReadOnly] protected float _timeout = 0;
-        protected float _defaultTimeout = 0;
+        [SerializeField, ReadOnly] protected float _timeout = 0f;
+        protected float _defaultTimeout = 0f;
 
-        public bool Timely => _timeout <= 0 || _time < _timeout;
+        public bool Timely => _timeout <= 0f || _time < _timeout;
         [SerializeField, ReadOnly] protected bool _timely = false;
 
         public bool Awaiting => _awaiting;
@@ -39,9 +39,10 @@ namespace VED.Utilities
             _awaiting = false;
             _timeout  = _defaultTimeout;
             _timely   = Timely;
+            _time     = 0f;
         }
 
-        public virtual void Set(Func<bool> function, Action callback, float timeout = 0)
+        public virtual void Set(Func<bool> function, Action callback, float timeout = 0f)
         {
             Reset();
 
@@ -50,7 +51,7 @@ namespace VED.Utilities
             _function  = function;
             _callback  = callback;
             _timeStateIndex = TimeManager.Instance.TimeStates.Count - 1;
-            _timeout   = timeout == 0 ? _defaultTimeout : timeout;
+            _timeout   = timeout == 0f ? _defaultTimeout : timeout;
 
             TimeManager.Instance.AddAwaiter(this);
         }

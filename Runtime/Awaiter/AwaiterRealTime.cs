@@ -5,7 +5,7 @@ namespace VED.Utilities
     [Serializable]
     public class AwaiterRealtime : Awaiter
     {
-        public AwaiterRealtime(float timeout = 0) : base(timeout) { }
+        public AwaiterRealtime(float timeout = 0f) : base(timeout) { }
 
         public override void Reset()
         {
@@ -14,19 +14,20 @@ namespace VED.Utilities
             _function = null;
             _callback = null;
             _awaiting = false;
-            _timeout = _defaultTimeout;
-            _timely = Timely;
+            _timeout  = _defaultTimeout;
+            _timely   = Timely;
+            _time     = 0f;
         }
 
-        public override void Set(Func<bool> function, Action callback, float timeout = 0)
+        public override void Set(Func<bool> function, Action callback, float timeout = 0f)
         {
             Reset();
 
-            _awaiting = true;
+            _awaiting  = true;
             _recursive = true;
-            _function = function;
-            _callback = callback;
-            _timeout = timeout == 0 ? _defaultTimeout : timeout;
+            _function  = function;
+            _callback  = callback;
+            _timeout   = timeout == 0f ? _defaultTimeout : timeout;
 
             TimeManager.Instance.AddAwaiter(this);
         }
