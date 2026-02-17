@@ -5,7 +5,7 @@ namespace VED.Utilities
 {
     public class StateManager
     {
-        public IReadOnlyCollection<State> Stack => _stack;
+        public  Stack<State>  Stack => _stack;
         private Stack<State> _stack = new Stack<State>();
 
         public Action<State> OnPush = null;
@@ -57,7 +57,7 @@ namespace VED.Utilities
 
     public class StateManager<T> where T : State
     {
-        public IReadOnlyCollection<T> Stack => _stack;
+        public  Stack<T>  Stack => _stack;
         private Stack<T> _stack = new Stack<T>();
 
         public Action<T> OnPush = null;
