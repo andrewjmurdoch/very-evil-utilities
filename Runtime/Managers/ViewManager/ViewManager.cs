@@ -17,23 +17,27 @@ namespace VED.Utilities
             }
             set
             {
-                if (_viewMapper != null) DeinitViewMapper();
-                if (value != null) InitViewMapper(value);
+                if (_viewMapper != null)
+                    DeinitViewMapper();
+
+                if (value != null)
+                    InitViewMapper(value);
             }
         }
         private ViewMapper _viewMapper = null;
 
         private Dictionary<Type, View> _views = new Dictionary<Type, View>();
 
-        public Dictionary<string, Goo> ViewLayers => _viewLayers;
+        public  Dictionary<string, Goo>  ViewLayers => _viewLayers;
         private Dictionary<string, Goo> _viewLayers = new Dictionary<string, Goo>();
 
-        public Goo Goo => _goo;
+        public  Goo  Goo => _goo;
         private Goo _goo = null;
 
-        public Camera Camera => _camera;
+        public  Camera  Camera => _camera;
         private Camera _camera = null;
 
+        public  Canvas  Canvas => _canvas;
         private Canvas _canvas = null;
 
         public string Layer
