@@ -5,25 +5,25 @@ using UnityEngine;
 namespace VED.Utilities
 {
     [Serializable]
+    public class Map<T, U>
+    {
+        [SerializeField] public T Key;
+        [SerializeField] public U Value;
+    
+        public Map(T key, U value)
+        {
+            Key = key;
+            Value = value;
+        }
+    }
+
+    [Serializable]
     public class Mapper<T, U>
     {
-        [Serializable]
-        public class Map
-        {
-            [SerializeField] public T Key;
-            [SerializeField] public U Value;
+        public List<Map<T, U>> Maps => _maps;
+        [SerializeField] private List<Map<T, U>> _maps = new List<Map<T, U>>();
     
-            public Map(T key, U value)
-            {
-                Key = key;
-                Value = value;
-            }
-        }
-    
-        public List<Map> Maps => _maps;
-        [SerializeField] private List<Map> _maps = new List<Map>();
-    
-        private Dictionary<T, U> Dictionary => _dictionary ??= InitDictionary();
+        private Dictionary<T, U>  Dictionary => _dictionary ??= InitDictionary();
         private Dictionary<T, U> _dictionary = null;
     
         private Dictionary<T, U> InitDictionary()
@@ -33,7 +33,7 @@ namespace VED.Utilities
             return _dictionary;
         }
     
-        public void Init(List<Map> maps)
+        public void Init(List<Map<T, U>> maps)
         {
             _maps = maps;
             Validate();
@@ -55,17 +55,21 @@ namespace VED.Utilities
     
         public Optional<U> Get(T key)
         {
-            return new Optional<U>(Dictionary.TryGetValue(key, out U value), value);
+            return new Optional<U>(Get(key, out U value), value);
         }
     
         public bool Get(T key, out U value)
         {
+            if (Dictionary.TryGetValue(key, out value))
+                return true;
+
+            Validate();
             return Dictionary.TryGetValue(key, out value);
         }
     
         public bool Set(T key, U value)
         {
-            foreach (Map map in _maps)
+            foreach (Map<T, U> map in _maps)
             {
                 if (!map.Key.Equals(key)) continue;
                 map.Value = value;
@@ -95,7 +99,7 @@ namespace VED.Utilities
             }
     
             Dictionary.Clear();
-            foreach (Map map in _maps)
+            foreach (Map<T, U> map in _maps)
             {
                 if (map.Key == null) continue;
                 Dictionary.TryAdd(map.Key, map.Value);
@@ -106,7 +110,7 @@ namespace VED.Utilities
         {
             if (Dictionary.ContainsKey(key)) return false;
     
-            _maps.Add(new Map(key, value));
+            _maps.Add(new Map<T, U>(key, value));
             Validate();
     
             return true;
@@ -131,6 +135,14 @@ namespace VED.Utilities
         public bool Contains(T key)
         {
             return Dictionary.ContainsKey(key);
+        }
+        public void Clear()
+        {
+            _maps.Clear();
+
+            if (_dictionary != null)
+                _dictionary.Clear();
+            _dictionary = null;
         }
     }
 }
