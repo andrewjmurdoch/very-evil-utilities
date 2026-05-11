@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VED.Utilities
@@ -25,6 +26,9 @@ namespace VED.Utilities
     
         private Dictionary<T, U>  Dictionary => _dictionary ??= InitDictionary();
         private Dictionary<T, U> _dictionary = null;
+
+        public List<T> Keys   => _maps.Select(m => m.Key  ).ToList();
+        public List<U> Values => _maps.Select(m => m.Value).ToList();
     
         public Mapper()
         {
