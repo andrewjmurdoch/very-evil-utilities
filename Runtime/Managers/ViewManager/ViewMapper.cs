@@ -148,8 +148,8 @@ namespace VED.Utilities
                 gooTransform.SetParent(gooViewManager.RectTransform, false);
                 gooTransform.SetAsLastSibling();
 
-                gooViewLayer.SizeHorizontalValue = new Value(Gooey.ValueType.PERCENTAGE, 100f);
-                gooViewLayer.SizeVerticalValue   = new Value(Gooey.ValueType.PERCENTAGE, 100f);
+                gooViewLayer.SizeHorizontal = new Value(Gooey.ValueType.PERCENTAGE, 100f);
+                gooViewLayer.SizeVertical   = new Value(Gooey.ValueType.PERCENTAGE, 100f);
                 gooViewLayer.gameObject.layer    = LayerMask.NameToLayer("UI");
 
                 for (int j = 0; j < viewLayer.Views.Count; j++)
