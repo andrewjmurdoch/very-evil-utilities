@@ -3,7 +3,8 @@
     "rootNamespace": "VED",
     "references": [
         "Unity.RenderPipelines.Universal.Runtime",
-        "com.veryevildemons.Gooey"
+        "com.veryevildemons.Gooey",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
