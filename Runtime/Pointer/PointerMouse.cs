@@ -6,13 +6,15 @@ namespace VED.Utilities
 {
     public class PointerMouse : Pointer
     {
-        private Camera _camera = null;
-        private Vector2 _scroll   = Vector2.zero;
+        private Camera  _camera = null;
+        private Vector2 _scroll = Vector2.zero;
     
         private const float THRESHOLD_SCROLL = 000.010f;
     
         public void Init(Camera camera, List<Pointable> pointables = null)
         {
+            _camera = camera;
+
             base.Init(pointables);
         }
     

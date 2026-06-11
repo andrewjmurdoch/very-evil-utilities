@@ -9,21 +9,21 @@ namespace VED.Utilities
     {
         public static readonly float LERP_DECAY_CONSTANT = 42f;
 
-        [SerializeField] public T Component;
-        [SerializeField] public U Unpointed;
-        [SerializeField] public U Pointed;
-        [SerializeField] public U Pressed;
-        [SerializeField] public U Disabled;
+        [SerializeField] protected T _component;
+        [SerializeField] protected U _unpointed;
+        [SerializeField] protected U _pointed;
+        [SerializeField] protected U _pressed;
+        [SerializeField] protected U _disabled;
 
         public U Get(PointableButton.State state)
         {
             switch (state)
             {
-                case PointableButton.State.UNPOINTED: return Unpointed;
-                case PointableButton.State.POINTED  : return Pointed;
-                case PointableButton.State.PRESSED  : return Pressed;
-                case PointableButton.State.DISABLED : return Disabled;
-                            default : return Unpointed;
+                case PointableButton.State.UNPOINTED: return _unpointed;
+                case PointableButton.State.POINTED  : return _pointed;
+                case PointableButton.State.PRESSED  : return _pressed;
+                case PointableButton.State.DISABLED : return _disabled;
+                default                             : return _unpointed;
             }
         }
 
@@ -35,9 +35,9 @@ namespace VED.Utilities
     {
         public override void Tick(PointableButton.State state)
         {
-            Color color = Easing.Lerp(Component.color, Get(state), Time.deltaTime, LERP_DECAY_CONSTANT);
-            color.a = Component.color.a;
-            Component.color = color;
+            Color color = Easing.Lerp(_component.color, Get(state), Time.deltaTime, LERP_DECAY_CONSTANT);
+            color.a = _component.color.a;
+            _component.color = color;
         }
     }
 
@@ -46,9 +46,9 @@ namespace VED.Utilities
     {
         public override void Tick(PointableButton.State state)
         {
-            Color color = Component.color;
+            Color color = _component.color;
             color.a = Easing.Lerp(color.a, Get(state), Time.deltaTime, LERP_DECAY_CONSTANT);
-            Component.color = color;
+            _component.color = color;
         }
     }
 
@@ -57,7 +57,7 @@ namespace VED.Utilities
     {
         public override void Tick(PointableButton.State state)
         {
-            Component.localScale = Easing.Lerp(Component.localScale, Vector3.one * Get(state), Time.deltaTime, LERP_DECAY_CONSTANT);
+            _component.localScale = Easing.Lerp(_component.localScale, Vector3.one * Get(state), Time.deltaTime, LERP_DECAY_CONSTANT);
         }
     }
 
@@ -66,9 +66,9 @@ namespace VED.Utilities
     {
         public override void Tick(PointableButton.State state)
         {
-            Vector3 localPosition = Component.localPosition;
+            Vector3 localPosition = _component.localPosition;
             localPosition.z = Easing.Lerp(localPosition.z, Get(state), Time.deltaTime, LERP_DECAY_CONSTANT);
-            Component.localPosition = localPosition;
+            _component.localPosition = localPosition;
         }
     }
 }

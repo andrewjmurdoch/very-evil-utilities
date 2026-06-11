@@ -13,25 +13,25 @@ namespace VED.Utilities
     
         [Space(10)]
         [SerializeField] private Goo _gooScrollable  = null;
-    
-        [Space(10)]
         [SerializeField] private Goo _gooScrollThumb = null;
         [SerializeField] private Goo _gooScrollTrack = null;
     
         [Space(10)]
         [SerializeField] private Behaviour _behaviour = Behaviour.SPRING;
+        [SerializeField] private Curve     _curveSpring = new();
     
         [Space(10)]
-        [SerializeField] private float _position     = 000.000f;
-        [SerializeField] private float _velocity     = 000.000f;
-        [SerializeField] private float _acceleration = 010.000f;
-        [SerializeField] private float _deceleration = 000.700f;
-        [SerializeField] private float _friction     = 000.650f;
-        [SerializeField] private float _velocityMax  = 020.000f;
+        [SerializeField] private float _friction       = 010.000f;
+        [SerializeField] private float _velocityMax    = 020.000f;
+        [SerializeField] private float _springStrength = 010.000f;
+        [SerializeField] private float _scrollStrength = 010.000f;
     
-        [SerializeField, ReadOnly] private float _normal = 000.000f;
-        [SerializeField, ReadOnly] private float _total  = 000.000f;
-        [SerializeField, ReadOnly] private float _limit  = 000.000f;
+        private float _position = 000.000f;
+        private float _velocity = 000.000f;
+        private float _normal   = 000.000f;
+        private float _total    = 000.000f;
+        private float _limit    = 000.000f;
+        private float _scaler   = 001.000f;
     
         private const float MIN_THUMB_SCALE = 5f;
         private const float LIMIT_PERCENT   = 5f;
@@ -40,8 +40,12 @@ namespace VED.Utilities
     
         private void OnValidate()
         {
+            if (!_gooScrollable)
+                return;
+
             _gooScrollable.PositionAlignmentVertical = AlignmentVertical.TOP;
             _gooScrollable.PositionVertical.Type     = ValueType.VALUE;
+            _gooScrollable.PivotVertical             = 1f;
          
             if (!_gooScrollThumb)
                 return;
@@ -66,7 +70,13 @@ namespace VED.Utilities
     
         private bool TickReferences()
         {
-            return _gooScrollable != null;
+            if (!_gooScrollable)
+                return false;
+
+            _scaler = _gooScrollable.RectTransform.lossyScale.y;
+            _scaler = _scaler <= 0f ? 1f : _scaler;
+
+            return true;
         }
     
         private bool TickTotal()
@@ -83,12 +93,8 @@ namespace VED.Utilities
         {
             if (Mathf.Abs(_velocity) <= 0)
                 return true;
-    
-            // don't apply friciton while returning from out of bounds
-            if (_position < 0f || _position > _total)
-                return true;
-    
-            _velocity -= Mathf.Sign(_velocity) * Mathf.Min(_friction * Time.deltaTime, Mathf.Abs(_velocity));
+
+            _velocity -= Mathf.Sign(_velocity) * Mathf.Min((_friction / _scaler) * Time.deltaTime, Mathf.Abs(_velocity));
             return true;
         }
     
@@ -114,48 +120,22 @@ namespace VED.Utilities
     
         private void TickBoundsMin()
         {
-            float amount;
-    
             float difference = Mathf.Abs(_position);
-            float normal = Mathf.InverseLerp(0f, _limit, difference);
+            float normal = _curveSpring[Mathf.InverseLerp(0f, _limit, difference)];
     
-            // decel if moving away
-            if (_velocity < 0f)
-                _velocity += Mathf.Abs(_velocity) * normal * Time.deltaTime;
-    
-            // accel to return
-            _velocity += normal * _acceleration * Time.deltaTime;
-    
-            // decel returning
-            normal = 1f - normal;
-            amount = Mathf.Abs(_velocity) * normal * _deceleration;
-            _velocity -= Mathf.Min(amount * Time.deltaTime, Mathf.Abs(_velocity));
-    
-            // prevent overshoot
-            _velocity = Mathf.Min(difference / Time.deltaTime, _velocity);
+            _velocity = Mathf.Lerp(_velocity, 0f, normal);
+
+            _position = Easing.Lerp(_position, 0f, _springStrength);
         }
     
         private void TickBoundsMax()
         {
-            float amount;
-    
             float difference = Mathf.Abs(_position - _total);
-            float normal = Mathf.InverseLerp(0f, _limit, difference);
-    
-            // decel if moving away
-            if (_velocity > 0f)
-                _velocity -= Mathf.Abs(_velocity) * normal * Time.deltaTime;
-    
-            // accel to return
-            _velocity -= normal * _acceleration * Time.deltaTime;
-    
-            // decel returning
-            normal = 1f - normal;
-            amount = Mathf.Abs(_velocity) * normal * _deceleration;
-            _velocity += Mathf.Min(amount * Time.deltaTime, Mathf.Abs(_velocity));
-    
-            // prevent overshoot
-            _velocity = Mathf.Max(-(difference / Time.deltaTime), _velocity);
+            float normal = _curveSpring[Mathf.InverseLerp(0f, _limit, difference)];
+
+            _velocity = Mathf.Lerp(_velocity, 0f, normal);
+
+            _position = Easing.Lerp(_position, _total, _springStrength);
         }
     
         private bool TickVelocity()
@@ -256,12 +236,37 @@ namespace VED.Utilities
         private void ScrollVelocity(float amount)
         {
             float sign = Mathf.Sign(amount);
+            float max;
+
+            if (_position < 0f)
+            {
+                float difference = Mathf.Abs(_position);
+                float normal = _curveSpring[1f - Mathf.InverseLerp(0f, _limit, difference)];
+
+                max = sign == Mathf.Sign(_velocity)
+                ? ((_velocityMax * normal) / _scaler) - Mathf.Abs(_velocity)
+                : ((_velocityMax * normal) / _scaler) + Mathf.Abs(_velocity);
     
-            float min = sign == Mathf.Sign(_velocity)
-                ? _velocityMax - Mathf.Abs(_velocity)
-                : _velocityMax + Mathf.Abs(_velocity);
+                _velocity += sign * Mathf.Min(Mathf.Abs(amount * Time.deltaTime), max);
+            }
     
-            _velocity += sign * Mathf.Min(Mathf.Abs(amount) * Time.deltaTime, min);
+            if (_position > _total)
+            {
+                float difference = Mathf.Abs(_position - _total);
+                float normal = _curveSpring[1f - Mathf.InverseLerp(0f, _limit, difference)];
+
+                max = sign == Mathf.Sign(_velocity)
+                ? ((_velocityMax * normal) / _scaler) - Mathf.Abs(_velocity)
+                : ((_velocityMax * normal) / _scaler) + Mathf.Abs(_velocity);
+    
+                _velocity += sign * Mathf.Min(Mathf.Abs(amount * Time.deltaTime), max);
+            }
+
+            max = sign == Mathf.Sign(_velocity)
+            ? (_velocityMax / _scaler) - Mathf.Abs(_velocity)
+            : (_velocityMax / _scaler) + Mathf.Abs(_velocity);
+    
+            _velocity += sign * Mathf.Min(Mathf.Abs(amount * Time.deltaTime), max);
         }
     
         public void ScrollNormal(float normal)
@@ -280,7 +285,7 @@ namespace VED.Utilities
     
         public override void Drag(Pointer pointer, Drag drag) 
         {
-            Vector3 difference = drag.To - drag.From;
+            Vector3 difference = (drag.To - drag.From) / _gooScrollable.RectTransform.lossyScale.y;
             Vector3 projected  = Vector3.Project(difference, _gooScrollable.Downward);
     
             bool  downward  = Vector3.Angle(projected.normalized, _gooScrollable.Downward) <= 90f;
@@ -296,13 +301,12 @@ namespace VED.Utilities
             bool downward = Vector3.Angle(projected.normalized, _gooScrollable.Downward) <= 90f;
             float multiplier = downward ? -1f : 1f;
     
-            ScrollVelocity(multiplier * swipe.Speed);
+            ScrollVelocity(multiplier * (swipe.Speed / _scaler));
         }
     
         public override void Scroll(Pointer pointer, Vector2 scroll)
         {
-            const float SCROLL_VELOCITY = 5f;
-            ScrollVelocity(scroll.y * SCROLL_VELOCITY);
+            ScrollVelocity((scroll.y * _scrollStrength) / _scaler);
         }
     }
 }
