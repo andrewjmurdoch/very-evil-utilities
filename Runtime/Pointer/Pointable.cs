@@ -7,7 +7,7 @@ namespace VED.Utilities
     [RequireComponent(typeof(Collider))]
     public class Pointable : MonoBehaviour
     {
-        protected const float RANGE = 10f;
+        protected const float RANGE = 20f;
     
         private Transform _transform = null;
         private bool      _enabled   = true;
