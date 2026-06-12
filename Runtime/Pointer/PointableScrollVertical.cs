@@ -260,6 +260,9 @@ namespace VED.Utilities
     
         public override void Drag(Pointer pointer, Drag drag) 
         {
+            if (!_gooScrollable)
+                return;
+
             Vector3 difference = (drag.To - drag.From) / _gooScrollable.RectTransform.lossyScale.y;
             Vector3 projected  = Vector3.Project(difference, _gooScrollable.Downward);
     
@@ -271,6 +274,9 @@ namespace VED.Utilities
     
         public override void Swipe(Pointer pointer, Swipe swipe)
         {
+            if (!_gooScrollable)
+                return;
+
             Vector3 projected = Vector3.Project(swipe.Direction, _gooScrollable.Downward);
     
             bool downward = Vector3.Angle(projected.normalized, _gooScrollable.Downward) <= 90f;

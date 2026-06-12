@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VED.Utilities
 {
-    public class PointableSliderHorizontal : PointableButton
+    public class PointableSliderVertical : PointableButton
     {
         [SerializeField] private Goo    _gooSlideHandle = null;
         [SerializeField] private Goo    _gooSlideLevel  = null;
@@ -29,14 +29,14 @@ namespace VED.Utilities
                 _gooSlideHandle = gameObjectGooSlideHandle.AddComponent<Goo>();
             }
             
-            _gooSlideHandle.PositionAlignmentHorizontal = AlignmentHorizontal.LEFT;
-            _gooSlideHandle.PositionHorizontal = new Value(Gooey.ValueType.PERCENTAGE, (float)Normal * 100f);
+            _gooSlideHandle.PositionAlignmentVertical = AlignmentVertical.BOTTOM;
+            _gooSlideHandle.PositionVertical = new Value(Gooey.ValueType.PERCENTAGE, (float)Normal * 100f);
 
             if (_gooSlideLevel)
             {
-                _gooSlideLevel.PositionAlignmentHorizontal = AlignmentHorizontal.LEFT;
-                _gooSlideLevel.PivotHorizontal = -1f;
-                _gooSlideLevel.SizeHorizontal = new Value(Gooey.ValueType.PERCENTAGE, (float)Normal * 100f);
+                _gooSlideLevel.PositionAlignmentVertical = AlignmentVertical.BOTTOM;
+                _gooSlideLevel.PivotVertical = -1f;
+                _gooSlideLevel.SizeVertical = new Value(Gooey.ValueType.PERCENTAGE, (float)Normal * 100f);
             }
         }
 
@@ -62,10 +62,10 @@ namespace VED.Utilities
                 return;
             
             _value = Mathf.Lerp(_minimum, _maximum, GetNormal(position));
-            _gooSlideHandle.PositionHorizontal.Float = (float)Normal * 100f;
+            _gooSlideHandle.PositionVertical.Float = (float)Normal * 100f;
             
             if (_gooSlideLevel)
-                _gooSlideLevel.SizeHorizontal.Float = (float)Normal * 100f;
+                _gooSlideLevel.SizeVertical.Float = (float)Normal * 100f;
     
             OnSlide?.Invoke();
         }
@@ -76,10 +76,10 @@ namespace VED.Utilities
                 return;
 
             _value = Mathf.Lerp(_minimum, _maximum, GetNormal(drag.To));
-            _gooSlideHandle.PositionHorizontal.Float = (float)Normal * 100f;
+            _gooSlideHandle.PositionVertical.Float = (float)Normal * 100f;
     
             if (_gooSlideLevel)
-                _gooSlideLevel.SizeHorizontal.Float = (float)Normal * 100f;
+                _gooSlideLevel.SizeVertical.Float = (float)Normal * 100f;
             
             OnSlide?.Invoke();
         }
@@ -87,20 +87,23 @@ namespace VED.Utilities
         private float GetNormal(Vector3 position)
         {
             if (   !_gooSlideHandle
-                || !_gooSlideHandle.GetReferencePositionHorizontal(out Goo gooSlideHandeReference))
+                || !_gooSlideHandle.GetReferencePositionVertical(out Goo gooSlideHandeReference))
                 return 0f;
 
-            Vector3 differenceLeftToPosition = position - gooSlideHandeReference.Left;
-            differenceLeftToPosition = Vector3.ProjectOnPlane(differenceLeftToPosition, gooSlideHandeReference.Forward);
-            differenceLeftToPosition = Vector3.ProjectOnPlane(differenceLeftToPosition, gooSlideHandeReference.Upward );
+            Vector3 difference = position - gooSlideHandeReference.Bottom;
+            difference = Vector3.ProjectOnPlane(difference, gooSlideHandeReference.Forward  );
+            difference = Vector3.ProjectOnPlane(difference, gooSlideHandeReference.Rightward);
     
-            Vector3 differenceLeftToRight    = gooSlideHandeReference.Right - gooSlideHandeReference.Left;
+            Vector3 total = gooSlideHandeReference.Top - gooSlideHandeReference.Bottom;
     
-            if (Vector3.Angle(differenceLeftToRight, differenceLeftToPosition) > 90f)
+            if (Vector3.Angle(total, difference) > 90f)
                 return 0f;
     
-            float maximum = differenceLeftToRight.magnitude > 0 ? differenceLeftToRight.magnitude : 1f;
-            return Mathf.Clamp(differenceLeftToPosition.magnitude / maximum, 0f, 1f);
+            float maximum = total.magnitude > 0 
+                ? total.magnitude 
+                : 1f;
+
+            return Mathf.Clamp01(difference.magnitude / maximum);
         }
     
         public void SetNormal(float normal)
@@ -109,10 +112,10 @@ namespace VED.Utilities
                 return;
 
             _value = Mathf.Lerp(_minimum, _maximum, normal);
-            _gooSlideHandle.PositionHorizontal.Float = (float)Normal * 100f;
+            _gooSlideHandle.PositionVertical.Float = (float)Normal * 100f;
             
             if (_gooSlideLevel)
-                _gooSlideLevel.SizeHorizontal.Float = (float)Normal * 100f;
+                _gooSlideLevel.SizeVertical.Float = (float)Normal * 100f;
         }
     
         public void SetValue(float value)
@@ -121,10 +124,10 @@ namespace VED.Utilities
                 return;
 
             _value = Mathf.Clamp(value, _minimum, _maximum);
-            _gooSlideHandle.PositionHorizontal.Float = (float)Normal * 100f;
+            _gooSlideHandle.PositionVertical.Float = (float)Normal * 100f;
             
             if (_gooSlideLevel)
-                _gooSlideLevel.SizeHorizontal.Float = (float)Normal * 100f;
+                _gooSlideLevel.SizeVertical.Float = (float)Normal * 100f;
         }
     }
 }

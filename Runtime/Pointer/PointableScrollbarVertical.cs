@@ -11,8 +11,6 @@ namespace VED.Utilities
         [SerializeField] private PointableScrollVertical _pointableScrollVertical = null;
         [SerializeField] private Goo                     _gooScrollThumb          = null;
 
-        private Goo _goo = null;
-
         public void OnValidate()
         {
             if (!_gooScrollThumb)
@@ -28,28 +26,32 @@ namespace VED.Utilities
             _gooScrollThumb.SizeVertical    .Type     = ValueType.PERCENTAGE;
         }
 
-        public override void Init()
-        {
-            _goo = GetComponent<Goo>();
-
-            base.Init();
-        }
-
         public override void Tick()
         {
-            if (!TickSize    ()) return;
-            if (!TickPosition()) return;
+            if (!TickReferences()) return;
+            if (!TickSize      ()) return;
+            if (!TickPosition  ()) return;
+        }
+
+        private bool TickReferences()
+        {
+            if (   !_gooScrollThumb
+                || !_gooScrollThumb.GetReferenceSizeVertical    (out Goo gooScrollThumbReferenceSize    )
+                || !_gooScrollThumb.GetReferencePositionVertical(out Goo gooScrollThumbReferencePosition)
+                || gooScrollThumbReferenceSize != gooScrollThumbReferencePosition)
+                return false;
+
+            if (   !_pointableScrollVertical
+                || !_pointableScrollVertical.GooScrollable
+                || !_pointableScrollVertical.GooScrollable.GetReferenceSizeVertical(out Goo gooScrollableReference))
+                return false;
+
+            return true;
         }
 
         private bool TickSize()
         {
-            if (   !_goo
-                || !_gooScrollThumb)
-                return false;
-
-            if (   !_pointableScrollVertical.GooScrollable
-                || !_pointableScrollVertical.GooScrollable.GetReferenceSizeVertical(out Goo gooScrollableReference))
-                return false;
+            _pointableScrollVertical.GooScrollable.GetReferenceSizeVertical(out Goo gooScrollableReference);
             
             // scale thumb in accordance to total scrollable area
             float thumbScale = (1f - (_pointableScrollVertical.Total / gooScrollableReference.RectTransform.rect.height)) * 100f;
@@ -61,16 +63,10 @@ namespace VED.Utilities
 
         private bool TickPosition()
         {
-            if (   !_goo
-                || !_gooScrollThumb)
-                return false;
-
-            if (   !_pointableScrollVertical.GooScrollable
-                || !_pointableScrollVertical.GooScrollable.GetReferenceSizeVertical(out Goo gooScrollableReference))
-                return false;
+            _gooScrollThumb.GetReferenceSizeVertical(out Goo gooScrollThumbReference);
     
             // position thumb in accordance with normalized position / total
-            float thumbPadding = ((_gooScrollThumb.Height / 2f) / _goo.Height) * 100f;
+            float thumbPadding = ((_gooScrollThumb.Height / 2f) / gooScrollThumbReference.Height) * 100f;
             _gooScrollThumb.PositionVertical.Float = -Mathf.Lerp(-50f + thumbPadding, 50f - thumbPadding, _pointableScrollVertical.Normal);
 
             return true;
@@ -82,49 +78,57 @@ namespace VED.Utilities
 
             if (_gooScrollThumb.InBounds(position))
                 return;
-            
-            position = Vector3.ProjectOnPlane(position, _goo.Forward);
-            position = Vector3.ProjectOnPlane(position, _goo.Rightward );
-            position = _goo.Centre + position;
 
-            Vector3 bottom = _goo.Bottom + (_goo.Upward   * (_gooScrollThumb.Height / 2f));
-            Vector3 top    = _goo.Top    + (_goo.Downward * (_gooScrollThumb.Height / 2f));
+            if (   !_gooScrollThumb
+                || !_gooScrollThumb.GetReferencePositionVertical(out Goo gooScrollThumbReferencePosition))
+                return;
+
+            position = Vector3.ProjectOnPlane(position, gooScrollThumbReferencePosition.Forward  );
+            position = Vector3.ProjectOnPlane(position, gooScrollThumbReferencePosition.Rightward);
+            position = gooScrollThumbReferencePosition.Centre + position;
+
+            Vector3 bottom = gooScrollThumbReferencePosition.Bottom + (gooScrollThumbReferencePosition.Upward   * (_gooScrollThumb.Height / 2f));
+            Vector3 top    = gooScrollThumbReferencePosition.Top    + (gooScrollThumbReferencePosition.Downward * (_gooScrollThumb.Height / 2f));
 
             Vector3 difference = position - bottom;
 
             float total = (top - bottom).magnitude;
-            float amount = Vector3.Angle(difference.normalized, _goo.Upward) < 90f 
+            float amount = Vector3.Angle(difference.normalized, gooScrollThumbReferencePosition.Upward) < 90f 
                 ? (position - bottom).magnitude
                 : 0f;
 
             float normal = Mathf.Clamp01(amount / total);
 
-            _pointableScrollVertical.ScrollNormal(-normal);
+            _pointableScrollVertical.ScrollNormal(1f - normal);
         }
 
         public override void Drag(Pointer pointer, Drag drag)
         {
             base.Drag(pointer, drag);
 
+            if (   !_gooScrollThumb
+                || !_gooScrollThumb.GetReferencePositionVertical(out Goo gooScrollThumbReferencePosition))
+                return;
+
             Vector3 from = drag.From;
             Vector3 to   = drag.To;
 
-            from = Vector3.ProjectOnPlane(from, _goo.Forward  );
-            from = Vector3.ProjectOnPlane(from, _goo.Rightward);
-            from = _goo.Centre + from;
+            from = Vector3.ProjectOnPlane(from, gooScrollThumbReferencePosition.Forward  );
+            from = Vector3.ProjectOnPlane(from, gooScrollThumbReferencePosition.Rightward);
+            from = gooScrollThumbReferencePosition.Centre + from;
 
-            to   = Vector3.ProjectOnPlane(to  , _goo.Forward  );
-            to   = Vector3.ProjectOnPlane(to  , _goo.Rightward);
-            to   = _goo.Centre + to;
+            to   = Vector3.ProjectOnPlane(to  , gooScrollThumbReferencePosition.Forward  );
+            to   = Vector3.ProjectOnPlane(to  , gooScrollThumbReferencePosition.Rightward);
+            to   = gooScrollThumbReferencePosition.Centre + to;
 
             Vector3 difference = to - from;
 
-            float sign = Vector3.Angle(difference, _goo.Upward) < 90f
+            float sign = Vector3.Angle(difference, gooScrollThumbReferencePosition.Upward) < 90f
                 ?   1f
                 : - 1f;
 
-            Vector3 bottom = _goo.Bottom + (_goo.Upward   * (_gooScrollThumb.Height / 2f));
-            Vector3 top    = _goo.Top    + (_goo.Downward * (_gooScrollThumb.Height / 2f));
+            Vector3 bottom = gooScrollThumbReferencePosition.Bottom + (gooScrollThumbReferencePosition.Upward   * (_gooScrollThumb.Height / 2f));
+            Vector3 top    = gooScrollThumbReferencePosition.Top    + (gooScrollThumbReferencePosition.Downward * (_gooScrollThumb.Height / 2f));
             
             float total = (top - bottom).magnitude;
             float amount = Mathf.Clamp01(difference.magnitude / total);
