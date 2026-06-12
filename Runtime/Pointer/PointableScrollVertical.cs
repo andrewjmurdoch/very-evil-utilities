@@ -10,11 +10,11 @@ namespace VED.Utilities
             SPRING,
             CLAMP
         }
+
+        private const float LIMIT_PERCENT   = 5f;
     
         [Space(10)]
         [SerializeField] private Goo _gooScrollable  = null;
-        [SerializeField] private Goo _gooScrollThumb = null;
-        [SerializeField] private Goo _gooScrollTrack = null;
     
         [Space(10)]
         [SerializeField] private Behaviour _behaviour = Behaviour.SPRING;
@@ -33,26 +33,23 @@ namespace VED.Utilities
         private float _limit    = 000.000f;
         private float _scaler   = 001.000f;
     
-        private const float MIN_THUMB_SCALE = 5f;
-        private const float LIMIT_PERCENT   = 5f;
-    
-        public Goo GooScrollable => _gooScrollable;
+        public Goo   GooScrollable => _gooScrollable;
+        public float Total         => _total;
+        public float Normal        => _normal;
     
         private void OnValidate()
         {
             if (!_gooScrollable)
-                return;
+           {
+                GameObject gameObjectGooScrollable = new GameObject("Scrollable");
+                gameObjectGooScrollable.transform.SetParent(transform);
+
+                _gooScrollable = gameObjectGooScrollable.AddComponent<Goo>();
+            }
 
             _gooScrollable.PositionAlignmentVertical = AlignmentVertical.TOP;
             _gooScrollable.PositionVertical.Type     = ValueType.VALUE;
             _gooScrollable.PivotVertical             = 1f;
-         
-            if (!_gooScrollThumb)
-                return;
-    
-            _gooScrollThumb.PositionAlignmentVertical = AlignmentVertical.CENTRE;
-            _gooScrollThumb.PositionVertical.Type     = ValueType.PERCENTAGE;
-            _gooScrollThumb.SizeVertical    .Type     = ValueType.PERCENTAGE;
         }
     
         public override void Tick()
@@ -64,7 +61,6 @@ namespace VED.Utilities
             if (!TickVelocity  ()) return;
             if (!TickPosition  ()) return;
             if (!TickNormal    ()) return;
-            if (!TickScrollbar ()) return;
             if (!TickScroll    ()) return;
         }
     
@@ -177,28 +173,7 @@ namespace VED.Utilities
             _normal = Mathf.InverseLerp(0f, _total, _position);
             return true;
         }
-    
-        private bool TickScrollbar()
-        {
-            if (!_gooScrollable.GetReferenceSizeVertical(out Goo gooScrollableReference))
-                return true;
-            
-            if (   _gooScrollThumb == null
-                || _gooScrollTrack == null)
-                return true;
-    
-            // scale thumb in accordance to total scrollable area
-            float thumbScale = (1f - (_total / gooScrollableReference.RectTransform.rect.height)) * 100f;
-            _gooScrollThumb.SizeVertical.Float = Mathf.Max(thumbScale, MIN_THUMB_SCALE);
-            _gooScrollThumb.Tick();
-    
-            // position thumb in accordance with normalized position / total
-            float thumbPadding = ((_gooScrollThumb.Height / 2f) / _gooScrollTrack.Height) * 100f;
-            _gooScrollThumb.PositionVertical.Float = Mathf.Lerp(50f - thumbPadding, -50f + thumbPadding, _normal);
-            
-            return true;
-        }
-    
+
         private bool TickScroll()
         {
             // position scrollable
@@ -207,7 +182,7 @@ namespace VED.Utilities
             return true;
         }
     
-        private void ScrollPosition(float amount)
+        public void ScrollPosition(float amount)
         {
             float normal = 1f;
             float sign = Mathf.Sign(amount);
@@ -233,7 +208,7 @@ namespace VED.Utilities
             _velocity = 0f;
         }
     
-        private void ScrollVelocity(float amount)
+        public void ScrollVelocity(float amount)
         {
             float sign = Mathf.Sign(amount);
             float max;

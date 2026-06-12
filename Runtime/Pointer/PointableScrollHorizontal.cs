@@ -40,7 +40,12 @@ namespace VED.Utilities
         public void OnValidate()
         {
             if (!_gooScrollable)
-                return;
+            {
+                GameObject gameObjectGooScrollable = new GameObject("Scrollable");
+                gameObjectGooScrollable.transform.SetParent(transform);
+
+                _gooScrollable = gameObjectGooScrollable.AddComponent<Goo>();
+            }
 
             _gooScrollable.PositionAlignmentHorizontal = AlignmentHorizontal.LEFT;
             _gooScrollable.PositionHorizontal.Type     = ValueType.VALUE;
@@ -203,7 +208,7 @@ namespace VED.Utilities
             _velocity = 0f;
         }
     
-        private void ScrollVelocity(float amount)
+        public void ScrollVelocity(float amount)
         {
             float sign = Mathf.Sign(amount);
             float max;
