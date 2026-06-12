@@ -18,7 +18,11 @@ namespace VED.Utilities
     
         [Space(10)]
         [SerializeField] private Behaviour _behaviour   = Behaviour.SPRING;
-        [SerializeField] private Curve     _curveSpring = new();
+        [SerializeField] private Curve     _curveSpring = new(new Keyframe[2] 
+        { 
+            new Keyframe(0f, 0f, 0f, 2f), 
+            new Keyframe(1f, 1f, 0f, 0f) 
+        });
     
         [Space(10)]
         [SerializeField] private float _friction       = 010.000f;
