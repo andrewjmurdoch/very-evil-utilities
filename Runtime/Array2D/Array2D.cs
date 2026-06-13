@@ -21,6 +21,21 @@ public class Array2D<T>
         set => Resize(_width, value);
     }
 
+    public T[] Values
+    {
+        get => _values;
+        set
+        {
+            T[] values = new T[_width * _height];
+
+            int min = Mathf.Min(value.Length, values.Length);
+            for (int i = 0; i < min; i++)
+                values[i] = value[i];
+
+             _values = values;
+        }
+    }
+
     public Array2D(int width = 2, int height = 2)
     {
         _width  = width;
