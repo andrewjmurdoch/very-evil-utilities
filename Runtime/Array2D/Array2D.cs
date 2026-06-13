@@ -45,8 +45,8 @@ public class Array2D<T>
 
     public T this[int x, int y]
     {
-        get => _values[(x * _height) + y];
-        set => _values[(x * _height) + y] = value;
+        get => _values[x + (y * _width)];
+        set => _values[x + (y * _width)] = value;
     }
 
     private void Resize(int width, int height)
