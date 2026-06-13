@@ -49,6 +49,17 @@ public class Array2D<T>
         set => _values[x + (y * _width)] = value;
     }
 
+    public (int x, int y) this[int index]
+    {
+        get
+        {
+            int x = index % _width;
+            int y = index / _width;
+
+            return (x, y);
+        }
+    }
+
     private void Resize(int width, int height)
     {
         _width  = Mathf.Max(width , 0);
