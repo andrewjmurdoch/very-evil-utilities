@@ -62,14 +62,20 @@ public class Array2D<T>
 
     private void Resize(int width, int height)
     {
-        _width  = Mathf.Max(width , 0);
-        _height = Mathf.Max(height, 0);
+        int minWidth  = Mathf.Min(_width , Mathf.Max(width , 0));
+        int minHeight = Mathf.Min(_height, Mathf.Max(height, 0));
+
+        int oldWidth  = _width;
+        int oldHeight = _height;
+
+         _width  = width;
+         _height = height;
 
         T[] values = new T[_width * _height];
 
-            int min = Mathf.Min(_values.Length, values.Length);
-            for (int i = 0; i < min; i++)
-                values[i] = _values[i];
+        for (int x = 0; x < minWidth; x++)
+            for (int y = 0; y < minHeight; y++)
+                values[x + (y * _width)] = _values[x + (y * oldWidth)];
 
         _values = values;
     }
@@ -78,9 +84,9 @@ public class Array2D<T>
     {
         Array2D<T> values = new Array2D<T>(Height, Width);
         
-        for (int i = 0; i < Width; i++)
-            for (int j = 0; j < Height; j++)
-                values[j,i] = this[i,j];
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                values[y, x] = this[x, y];
 
         _values = values._values;
     }
@@ -89,9 +95,9 @@ public class Array2D<T>
     {
         Array2D<T> values = new Array2D<T>(Width, Height);
         
-        for (int i = 0; i < Width; i++)
-            for (int j = 0; j < Height; j++)
-                values[i,j] = this[(Width - (i + 1)),j];
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                values[x, y] = this[(Width - (x + 1)), y];
 
         _values = values._values;
     }
@@ -100,9 +106,9 @@ public class Array2D<T>
     {
         Array2D<T> values = new Array2D<T>(Width, Height);
         
-        for (int i = 0; i < Width; i++)
-            for (int j = 0; j < Height; j++)
-                values[i,j] = this[i,(Height - (j + 1))];
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                values[x, y] = this[x, (Height - (y + 1))];
 
         _values = values._values;
     }
@@ -111,9 +117,9 @@ public class Array2D<T>
     {
         Array2D<T> values = new Array2D<T>(Height, Width);
         
-        for (int i = 0; i < Width; i++)
-            for (int j = 0; j < Height; j++)
-                values[j,i] = this[i,(Height - (j + 1))];
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                values[y, x] = this[x, (Height - (y + 1))];
 
         _values = values._values;
     }
@@ -122,9 +128,9 @@ public class Array2D<T>
     {
         Array2D<T> values = new Array2D<T>(Height, Width);
         
-        for (int i = 0; i < Width; i++)
-            for (int j = 0; j < Height; j++)
-                values[j,i] = this[(Width - (i + 1)),j];
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                values[y, x] = this[(Width - (x + 1)), y];
 
         _values = values._values;
     }
