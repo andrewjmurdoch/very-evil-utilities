@@ -134,25 +134,28 @@ namespace VED.Utilities
             {
                 if (!pointable.Enabled)
                     continue;
-    
-                if (!pointable.Collider.Raycast(ray, out RaycastHit raycastHit, pointable.Range))
-                    continue;
-    
-                Vector3 position = raycastHit.point;
-    
-                if (!pointable.GetFlat())
+
+                foreach (Collider collider in pointable.Colliders)
                 {
-                    _pointed.Add(new (pointable, position));
-                    continue;
+                    if (!collider.Raycast(ray, out RaycastHit raycastHit, pointable.Range))
+                        continue;
+
+                    Vector3 position = raycastHit.point;
+
+                    if (!pointable.Flat)
+                    {
+                        _pointed.Add(new(pointable, position));
+                        break;
+                    }
+
+                    // flat, create plane to find pointed position
+                    Plane plane = new(pointable.Transform.forward, pointable.Transform.position);
+                    if (!plane.Raycast(ray, out float enter))
+                        break;
+
+                    position = ray.origin + (ray.direction * enter);
+                    _pointed.Add(new(pointable, position));
                 }
-                    
-                // flat, create plane to find pointed position
-                Plane plane = new (pointable.Transform.forward, pointable.Transform.position);
-                if (!plane.Raycast(ray, out float enter))
-                    continue;
-                
-                position = ray.origin + (ray.direction * enter);
-                _pointed.Add(new (pointable, position));
             }
     
             // if hit 1 or less, don't consider blocking, return

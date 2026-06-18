@@ -49,7 +49,7 @@ namespace VED.Utilities
                 Pointable = point.Pointable;
                 Pointed = true;
     
-                Plane = Pointable.GetFlat()
+                Plane = Pointable.Flat
                         ? new(Pointable.Transform.forward, Pointable.Transform.position)
                         : new(-direction                 , Pointable.Transform.position);
     
