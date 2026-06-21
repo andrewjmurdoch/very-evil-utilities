@@ -1,8 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace VED.Utilities
 {
+    public enum ActionType
+    {
+        PRESS,
+        UNPRESS
+    }
+
     public class PointableButton : Pointable
     {
         public enum State
@@ -12,22 +19,23 @@ namespace VED.Utilities
             PRESSED  ,
             DISABLED
         }
-    
+
         private StateManager<StatePointableButton> _stateManager = null;
     
-        [SerializeField, Space(10)] private PointableButtonAnimationTransformScale    [] _animationTransformScales     = new PointableButtonAnimationTransformScale    [] { };
-        [SerializeField, Space(10)] private PointableButtonAnimationTransformZPosition[] _animationTransformZPositions = new PointableButtonAnimationTransformZPosition[] { };
-        [SerializeField, Space(10)] private PointableButtonAnimationGraphicColor      [] _animationGraphicColors       = new PointableButtonAnimationGraphicColor      [] { };
-        [SerializeField, Space(10)] private PointableButtonAnimationGraphicAlpha      [] _animationGraphicAlphas       = new PointableButtonAnimationGraphicAlpha      [] { };
-    
+        [SerializeField, Space(10)] private List<PointableButtonAnimationTransformScale    > _animationTransformScales     = new List<PointableButtonAnimationTransformScale    > { };
+        [SerializeField, Space(10)] private List<PointableButtonAnimationTransformZPosition> _animationTransformZPositions = new List<PointableButtonAnimationTransformZPosition> { };
+        [SerializeField, Space(10)] private List<PointableButtonAnimationGraphicColor      > _animationGraphicColors       = new List<PointableButtonAnimationGraphicColor      > { };
+        [SerializeField, Space(10)] private List<PointableButtonAnimationGraphicAlpha      > _animationGraphicAlphas       = new List<PointableButtonAnimationGraphicAlpha      > { };
+
         [SerializeField, Space(10)] public UnityEvent Action = null;
-    
-        public  StateManager<StatePointableButton>                StateManager                 => _stateManager;
-        public PointableButtonAnimationTransformScale    []       AnimationTransformScales     => _animationTransformScales;
-        public PointableButtonAnimationTransformZPosition[]       AnimationTransformZPositions => _animationTransformZPositions;
-        public PointableButtonAnimationGraphicColor      []       AnimationGraphicColors       => _animationGraphicColors;
-        public PointableButtonAnimationGraphicAlpha      []       AnimationGraphicAlphas       => _animationGraphicAlphas;
-    
+        [SerializeField] public ActionType ActionType = ActionType.UNPRESS;
+
+        public StateManager<StatePointableButton>               StateManager                 => _stateManager;
+        public List<PointableButtonAnimationTransformScale    > AnimationTransformScales     => _animationTransformScales;
+        public List<PointableButtonAnimationTransformZPosition> AnimationTransformZPositions => _animationTransformZPositions;
+        public List<PointableButtonAnimationGraphicColor      > AnimationGraphicColors       => _animationGraphicColors;
+        public List<PointableButtonAnimationGraphicAlpha      > AnimationGraphicAlphas       => _animationGraphicAlphas;
+
         public override void Init()
         {
             base.Init();
@@ -39,12 +47,12 @@ namespace VED.Utilities
 
             pointableButtonStateUnpointed.Init(this);
         }
-    
+
         public override void Tick()
         {
             _stateManager.Tick();
         }
-    
+
         public override void Point(Pointer pointer, Vector3 position)
         {
             base.Point(pointer, position);
@@ -54,7 +62,7 @@ namespace VED.Utilities
 
             pointableButtonState.Point();
         }
-    
+
         public override void Unpoint(Pointer pointer)
         {
             base.Unpoint(pointer);
@@ -67,7 +75,7 @@ namespace VED.Utilities
 
             pointableButtonState.Unpoint();
         }
-    
+
         public override void Press(Pointer pointer, Vector3 position) 
         {
             base.Press(pointer, position);
@@ -76,8 +84,11 @@ namespace VED.Utilities
                 return;
 
             pointableButtonState.Press();
+
+            if (ActionType == ActionType.PRESS)
+                Action?.Invoke();
         }
-    
+
         public override void Unpress(Pointer pointer, bool cancel)
         {
             base.Unpress(pointer, cancel);
@@ -90,10 +101,10 @@ namespace VED.Utilities
 
             pointableButtonState.Unpress();
 
-            if (!cancel)
+            if (!cancel && ActionType == ActionType.UNPRESS)
                 Action?.Invoke();
         }
-    
+
         public override void Enable()
         {
             base.Enable();
@@ -103,7 +114,7 @@ namespace VED.Utilities
 
             pointableButtonState.Enable();
         }
-    
+
         public override void Disable()
         {
             base.Disable();
@@ -114,7 +125,7 @@ namespace VED.Utilities
             pointableButtonState.Disable();
         }
     }
-    
+
     public abstract class StatePointableButton : State
     {
         protected PointableButton _pointableButton = null;
@@ -126,16 +137,16 @@ namespace VED.Utilities
     
         protected void TickAnimatables(PointableButton.State state)
         {
-            for (int i = 0; i < _pointableButton.AnimationTransformScales.Length; i++)
+            for (int i = 0; i < _pointableButton.AnimationTransformScales.Count; i++)
                 _pointableButton.AnimationTransformScales[i].Tick(state);
 
-            for (int i = 0; i < _pointableButton.AnimationTransformZPositions.Length; i++)
+            for (int i = 0; i < _pointableButton.AnimationTransformZPositions.Count; i++)
                 _pointableButton.AnimationTransformZPositions[i].Tick(state);
 
-            for (int i = 0; i < _pointableButton.AnimationGraphicColors.Length; i++)
+            for (int i = 0; i < _pointableButton.AnimationGraphicColors.Count; i++)
                 _pointableButton.AnimationGraphicColors[i].Tick(state);
 
-            for (int i = 0; i < _pointableButton.AnimationGraphicAlphas.Length; i++)
+            for (int i = 0; i < _pointableButton.AnimationGraphicAlphas.Count; i++)
                 _pointableButton.AnimationGraphicAlphas[i].Tick(state);
         }
     
