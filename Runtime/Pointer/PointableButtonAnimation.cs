@@ -15,6 +15,35 @@ namespace VED.Utilities
         [SerializeField] protected U _pressed;
         [SerializeField] protected U _disabled;
 
+        public T Component
+        {
+            get => _component;
+            set => _component = value;
+        }
+
+        public U Unpointed
+        {
+            get => _unpointed;
+            set => _unpointed = value;
+        }
+        public U Pointed
+        {
+            get => _pointed;
+            set => _pointed = value;
+        }
+
+        public U Pressed
+        {
+            get => _pressed;
+            set => _pressed = value;
+        }
+
+        public U Disabled
+        {
+            get => _disabled;
+            set => _disabled = value;
+        }
+
         public U Get(PointableButton.State state)
         {
             switch (state)
