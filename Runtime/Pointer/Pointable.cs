@@ -130,6 +130,9 @@ namespace VED.Utilities
                 positions.Add(Transform.worldToLocalMatrix * (boxCollider.transform.position + (boxCollider.center + boxCollider.transform.rotation * new Vector3(-boxCollider.size.x * boxCollider.transform.lossyScale.x,  boxCollider.size.y * boxCollider.transform.lossyScale.y,  boxCollider.size.z * boxCollider.transform.lossyScale.z) * 0.5f)));
             }
 
+            if (positions.Count <= 0)
+                return false;
+
             Bounds bounds = GeometryUtility.CalculateBounds(positions.ToArray(), Matrix4x4.identity);
             Matrix4x4 matrixScale = Matrix4x4.Scale(Transform.lossyScale);
             Vector3 size = matrixScale * bounds.size;
