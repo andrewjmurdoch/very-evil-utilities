@@ -11,6 +11,8 @@ namespace VED.Utilities
         [SerializeField] private PointableScrollHorizontal _pointableScrollHorizontal = null;
         [SerializeField] private Goo                       _gooScrollThumb            = null;
 
+        public Goo GooScrollThumb => _gooScrollThumb;
+
         public void OnValidate()
         {
             if (!_gooScrollThumb)
