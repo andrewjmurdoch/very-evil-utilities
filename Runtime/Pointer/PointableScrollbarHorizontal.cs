@@ -54,7 +54,7 @@ namespace VED.Utilities
             _pointableScrollHorizontal.GooScrollable.GetReferenceSizeHorizontal(out Goo gooScrollableReference);
 
             // scale thumb in accordance to total scrollable area
-            float thumbScale = (1f - (_pointableScrollHorizontal.Total / gooScrollableReference.RectTransform.rect.width)) * 100f;
+            float thumbScale = Mathf.Clamp01(gooScrollableReference.Width / Mathf.Max(_pointableScrollHorizontal.Total, Mathf.Epsilon)) * 100f;
             _gooScrollThumb.SizeHorizontal.Float = Mathf.Max(thumbScale, MIN_THUMB_SCALE);
             _gooScrollThumb.Tick();
 
