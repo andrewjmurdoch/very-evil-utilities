@@ -26,9 +26,10 @@ namespace VED.Utilities
         [SerializeField, Space(10)] private List<PointableButtonAnimationTransformZPosition> _animationTransformZPositions = new List<PointableButtonAnimationTransformZPosition> { };
         [SerializeField, Space(10)] private List<PointableButtonAnimationGraphicColor      > _animationGraphicColors       = new List<PointableButtonAnimationGraphicColor      > { };
         [SerializeField, Space(10)] private List<PointableButtonAnimationGraphicAlpha      > _animationGraphicAlphas       = new List<PointableButtonAnimationGraphicAlpha      > { };
-
-        [SerializeField, Space(10)] public UnityEvent Action = null;
-        [SerializeField] public ActionType ActionType = ActionType.UNPRESS;
+        
+        [SerializeField, Space(10)] public UnityEvent ActionPress   = null;
+        [SerializeField, Space(10)] public UnityEvent ActionUnpress = null;
+        [SerializeField, Space(10)] public UnityEvent ActionCancel  = null;
 
         public StateManager<StatePointableButton>               StateManager                 => _stateManager;
         public List<PointableButtonAnimationTransformScale    > AnimationTransformScales     => _animationTransformScales;
@@ -85,8 +86,7 @@ namespace VED.Utilities
 
             pointableButtonState.Press();
 
-            if (ActionType == ActionType.PRESS)
-                Action?.Invoke();
+            ActionPress?.Invoke();
         }
 
         public override void Unpress(Pointer pointer, bool cancel)
@@ -101,8 +101,10 @@ namespace VED.Utilities
 
             pointableButtonState.Unpress();
 
-            if (!cancel && ActionType == ActionType.UNPRESS)
-                Action?.Invoke();
+            if (!cancel)
+                ActionUnpress?.Invoke();
+            else
+                ActionCancel?.Invoke();
         }
 
         public override void Enable()
