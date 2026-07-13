@@ -88,23 +88,9 @@ namespace VED.Utilities
                 || !_gooScrollThumb.GetReferencePositionHorizontal(out Goo gooScrollThumbReferencePosition))
                 return;
 
-            position = Vector3.ProjectOnPlane(position, gooScrollThumbReferencePosition.Forward);
-            position = Vector3.ProjectOnPlane(position, gooScrollThumbReferencePosition.Upward );
-            position = gooScrollThumbReferencePosition.Centre + position;
+            Vector2 normal = gooScrollThumbReferencePosition.Nomalize(position);
 
-            Vector3 left  = gooScrollThumbReferencePosition.Left  + (gooScrollThumbReferencePosition.Rightward * (_gooScrollThumb.Width / 2f));
-            Vector3 right = gooScrollThumbReferencePosition.Right + (gooScrollThumbReferencePosition.Leftward  * (_gooScrollThumb.Width / 2f));
-
-            Vector3 difference = position - left;
-
-            float total = (right - left).magnitude;
-            float amount = Vector3.Angle(difference.normalized, gooScrollThumbReferencePosition.Rightward) < 90f 
-                ? (position - left).magnitude
-                : 0f;
-
-            float normal = Mathf.Clamp01(amount / total);
-
-            _pointableScrollHorizontal.ScrollNormal(normal);
+            _pointableScrollHorizontal.ScrollNormal(normal.x);
         }
 
         public override void Drag(Pointer pointer, Drag drag)
