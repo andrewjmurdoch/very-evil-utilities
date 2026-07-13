@@ -202,7 +202,7 @@ namespace VED.Utilities
             {
                 pressed.Pointed = true;
                 pressed.Pointable.Point(_pointer, point.Position);
-                pressed.Pointable.Press(_pointer, point.Position);
+                pressed.Pointable.Press(_pointer, point.Position, true);
                 return true;
             }
     

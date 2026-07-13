@@ -255,9 +255,9 @@ namespace VED.Utilities
             ScrollPosition(position - _position);
         }
     
-        public override void Press(Pointer pointer, Vector3 position)
+        public override void Press(Pointer pointer, Vector3 position, bool repress = false) 
         {
-            base.Press(pointer, position);
+            base.Press(pointer, position, repress);
     
             _velocity = 0f;
         }

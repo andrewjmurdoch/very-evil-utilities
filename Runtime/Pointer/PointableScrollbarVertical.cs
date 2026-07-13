@@ -56,7 +56,7 @@ namespace VED.Utilities
             _pointableScrollVertical.GooScrollable.GetReferenceSizeVertical(out Goo gooScrollableReference);
             
             // scale thumb in accordance to total scrollable area
-            float thumbScale = Mathf.Clamp01(gooScrollableReference.Height / Mathf.Max(_pointableScrollVertical.Total, Mathf.Epsilon)) * 100f;
+            float thumbScale = Mathf.Clamp01(gooScrollableReference.Height / Mathf.Max(_pointableScrollVertical.GooScrollable.Height, Mathf.Epsilon)) * 100f;
             _gooScrollThumb.SizeVertical.Float = Mathf.Max(thumbScale, MIN_THUMB_SCALE);
             _gooScrollThumb.Tick();
 
@@ -74,9 +74,12 @@ namespace VED.Utilities
             return true;
         }
 
-        public override void Press(Pointer pointer, Vector3 position)
+        public override void Press(Pointer pointer, Vector3 position, bool repress = false) 
         {
-            base.Press(pointer, position);
+            base.Press(pointer, position, repress);
+
+            if (repress)
+                return;
 
             if (_gooScrollThumb.InBounds(position))
                 return;

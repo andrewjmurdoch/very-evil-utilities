@@ -73,7 +73,7 @@ namespace VED.Utilities
             Pointers.Remove(pointer);
         }
     
-        public virtual void Press(Pointer pointer, Vector3 position)
+        public virtual void Press(Pointer pointer, Vector3 position, bool repress = false)
         {
             if (Pressers.ContainsKey(pointer))
             {
