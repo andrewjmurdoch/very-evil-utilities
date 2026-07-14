@@ -51,6 +51,8 @@ namespace VED.Utilities
             _maximum = maximum;
             _value = Mathf.Clamp(value, _minimum, _maximum);
 
+            SetValue(_value);
+
             base.Init();
         }
     
