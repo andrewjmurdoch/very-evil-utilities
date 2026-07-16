@@ -26,6 +26,8 @@ namespace VED.Utilities
         [SerializeField, Space(10)] private List<PointableButtonAnimationTransformZPosition> _animationTransformZPositions = new List<PointableButtonAnimationTransformZPosition> { };
         [SerializeField, Space(10)] private List<PointableButtonAnimationGraphicColor      > _animationGraphicColors       = new List<PointableButtonAnimationGraphicColor      > { };
         [SerializeField, Space(10)] private List<PointableButtonAnimationGraphicAlpha      > _animationGraphicAlphas       = new List<PointableButtonAnimationGraphicAlpha      > { };
+
+        [SerializeField, Space(10)] private PointableButtonAudio _audio = new();
         
         [SerializeField, Space(10)] public UnityEvent ActionPress   = null;
         [SerializeField, Space(10)] public UnityEvent ActionUnpress = null;
@@ -36,6 +38,7 @@ namespace VED.Utilities
         public List<PointableButtonAnimationTransformZPosition> AnimationTransformZPositions => _animationTransformZPositions;
         public List<PointableButtonAnimationGraphicColor      > AnimationGraphicColors       => _animationGraphicColors;
         public List<PointableButtonAnimationGraphicAlpha      > AnimationGraphicAlphas       => _animationGraphicAlphas;
+        public PointableButtonAudio                             Audio                        => _audio;
 
         public override void Init()
         {
@@ -84,7 +87,7 @@ namespace VED.Utilities
             if (!_stateManager.TryPeek(out StatePointableButton pointableButtonState))
                 return;
 
-            pointableButtonState.Press();
+            pointableButtonState.Press(repress);
 
             ActionPress?.Invoke();
         }
@@ -99,7 +102,7 @@ namespace VED.Utilities
             if (!_stateManager.TryPeek(out StatePointableButton pointableButtonState))
                 return;
 
-            pointableButtonState.Unpress();
+            pointableButtonState.Unpress(cancel);
 
             if (!cancel)
                 ActionUnpress?.Invoke();
@@ -152,12 +155,12 @@ namespace VED.Utilities
                 _pointableButton.AnimationGraphicAlphas[i].Tick(state);
         }
     
-        public virtual void Point  () { }
-        public virtual void Unpoint() { }
-        public virtual void Press  () { }
-        public virtual void Unpress() { }
-        public virtual void Enable () { }
-        public virtual void Disable() { }
+        public virtual void Point  (            ) { }
+        public virtual void Unpoint(            ) { }
+        public virtual void Press  (bool repress) { }
+        public virtual void Unpress(bool cancel ) { }
+        public virtual void Enable (            ) { }
+        public virtual void Disable(            ) { }
     }
     
     public class StatePointableButtonUnpointed : StatePointableButton
@@ -169,6 +172,8 @@ namespace VED.Utilities
     
         public override void Point()
         {
+            _pointableButton.Audio.Pointed();
+
             StatePointableButtonPointed pointableButtonStatePointed = new();
 
             _pointableButton.StateManager.Pop();
@@ -179,6 +184,8 @@ namespace VED.Utilities
     
         public override void Disable()
         {
+            _pointableButton.Audio.Disabled();
+
             StatePointableButtonDisabled pointableButtonStateDisabled = new();
 
             _pointableButton.StateManager.Pop();
@@ -197,6 +204,8 @@ namespace VED.Utilities
     
         public override void Unpoint()
         {
+            _pointableButton.Audio.Unpointed();
+
             StatePointableButtonUnpointed pointableButtonStateUnpointed = new();
 
             _pointableButton.StateManager.Pop();
@@ -205,8 +214,10 @@ namespace VED.Utilities
             pointableButtonStateUnpointed.Init(_pointableButton);
         }
     
-        public override void Press()
+        public override void Press(bool repress)
         {
+            _pointableButton.Audio.Pressed(repress);
+
             StatePointableButtonPressed pointableButtonStatePressed = new();
 
             _pointableButton.StateManager.Pop();
@@ -217,6 +228,8 @@ namespace VED.Utilities
     
         public override void Disable()
         {
+            _pointableButton.Audio.Disabled();
+
             StatePointableButtonDisabled pointableButtonStateDisabled = new();
 
             _pointableButton.StateManager.Pop();
@@ -238,6 +251,8 @@ namespace VED.Utilities
             if (_pointableButton.Pointed)
                 return;
 
+            _pointableButton.Audio.Unpointed();
+
             StatePointableButtonUnpointed pointableButtonStateUnpointed = new();
 
             _pointableButton.StateManager.Pop();
@@ -246,8 +261,10 @@ namespace VED.Utilities
             pointableButtonStateUnpointed.Init(_pointableButton);
         }
     
-        public override void Unpress()
+        public override void Unpress(bool cancel)
         {
+            _pointableButton.Audio.Unpressed(cancel);
+
             StatePointableButtonPointed pointableButtonStatePointed = new();
 
             _pointableButton.StateManager.Pop();
@@ -258,6 +275,8 @@ namespace VED.Utilities
     
         public override void Disable()
         {
+            _pointableButton.Audio.Disabled();
+
             StatePointableButtonDisabled pointableButtonStateDisabled = new();
 
             _pointableButton.StateManager.Pop();
@@ -276,6 +295,8 @@ namespace VED.Utilities
     
         public override void Enable()
         {
+            _pointableButton.Audio.Enabled();
+
             StatePointableButtonUnpointed pointableButtonStateUnpointed = new();
 
             _pointableButton.StateManager.Pop();
