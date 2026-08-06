@@ -27,6 +27,13 @@ namespace VED.Utilities
             _gooScrollThumb.PositionVertical.Type     = ValueType.PERCENTAGE;
             _gooScrollThumb.SizeVertical    .Type     = ValueType.PERCENTAGE;
         }
+        
+        public override void Init()
+        {
+            base.Init();
+
+            Tick();
+        }
 
         public override void Tick()
         {

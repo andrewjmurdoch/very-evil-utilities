@@ -55,6 +55,13 @@ namespace VED.Utilities
             _gooScrollable.PositionVertical.Type     = ValueType.VALUE;
             _gooScrollable.PivotVertical             = 1f;
         }
+
+        public override void Init()
+        {
+            base.Init();
+
+            Tick();
+        }
     
         public override void Tick()
         {

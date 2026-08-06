@@ -13,6 +13,13 @@ namespace VED.Utilities
 
         public Goo GooScrollThumb => _gooScrollThumb;
 
+        public override void Init()
+        {
+            base.Init();
+
+            Tick();
+        }
+
         public void OnValidate()
         {
             if (!_gooScrollThumb)
