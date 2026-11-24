@@ -24,21 +24,20 @@ namespace VED.Utilities
                     InitViewMapper(value);
             }
         }
-        private ViewMapper _viewMapper = null;
 
-        private Dictionary<Type, View> _views = new Dictionary<Type, View>();
+        private ViewMapper              _viewMapper  = null;
+        private Dictionary<string, Goo> _viewLayers  = new Dictionary<string, Goo>();
+        private Dictionary<Type, View>  _views       = new Dictionary<Type, View>();
+        private List<View>              _viewsActive = new List<View>();
+        private Camera                  _camera      = null;
+        private Canvas                  _canvas      = null;
+        private Goo                     _goo         = null;
+        private string                  _layer       = "UI";
 
         public  Dictionary<string, Goo>  ViewLayers => _viewLayers;
-        private Dictionary<string, Goo> _viewLayers = new Dictionary<string, Goo>();
-
-        public  Goo  Goo => _goo;
-        private Goo _goo = null;
-
-        public  Camera  Camera => _camera;
-        private Camera _camera = null;
-
-        public  Canvas  Canvas => _canvas;
-        private Canvas _canvas = null;
+        public  Camera                   Camera     => _camera;
+        public  Canvas                   Canvas     => _canvas;
+        public  Goo                      Goo        => _goo;
 
         public string Layer
         {
@@ -58,7 +57,6 @@ namespace VED.Utilities
                 }
             }
         }
-        private string _layer = "UI";
 
         protected override void Awake()
         {
@@ -68,13 +66,14 @@ namespace VED.Utilities
             _camera.transform.SetParent(transform);
             _camera.transform.position = new Vector3(0f, 0f, -10f);
             _camera.backgroundColor = Color.clear;
-            _camera.orthographic = true;
-            _camera.cullingMask = 1 << LayerMask.NameToLayer(_layer);
-            _camera.clearFlags = CameraClearFlags.Nothing;
-            _camera.depth = 100;
+            _camera.orthographic    = true;
+            _camera.cullingMask     = 1 << LayerMask.NameToLayer(_layer);
+            _camera.clearFlags      = CameraClearFlags.Nothing;
+            _camera.depth           = 100;
+            _camera.enabled         = false;
 
             UniversalAdditionalCameraData cameraData = _camera.GetUniversalAdditionalCameraData();
-            cameraData.renderType = CameraRenderType.Overlay;
+            cameraData.renderType           = CameraRenderType.Overlay;
             cameraData.renderPostProcessing = true;
 
             _goo = new GameObject("View Goo").AddComponent<Goo>();
@@ -149,10 +148,10 @@ namespace VED.Utilities
             camera.transform.SetParent(transform, false);
             camera.transform.position = new Vector3(0f, 0f, -10f);
             camera.backgroundColor = Color.clear;
-            camera.orthographic = true;
-            camera.cullingMask = 1 << LayerMask.NameToLayer(viewLayer.ID);
-            camera.clearFlags = CameraClearFlags.Nothing;
-            camera.depth = 100;
+            camera.orthographic    = true;
+            camera.cullingMask     = 1 << LayerMask.NameToLayer(viewLayer.ID);
+            camera.clearFlags      = CameraClearFlags.Nothing;
+            camera.depth           = 100;
 
             UniversalAdditionalCameraData cameraTransitionData = camera.GetUniversalAdditionalCameraData();
             cameraTransitionData.renderType = CameraRenderType.Overlay;
@@ -255,6 +254,26 @@ namespace VED.Utilities
                     viewTransform.SetAsLastSibling();
                 }
             }
+        }
+
+        public void Shown(View view)
+        {
+            _camera.enabled = true;
+
+            if (_viewsActive.Contains(view))
+                return;
+
+            _viewsActive.Add(view);
+        }
+
+        public void Hidden(View view)
+        {
+            _viewsActive.Remove(view);
+
+            if (_viewsActive.Count > 0)
+                return;
+
+            _camera.enabled = false;
         }
     }
 }
